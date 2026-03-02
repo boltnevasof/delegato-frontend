@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — Техподдержка</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <a href="index.html" class="header-logo">Delegata</a>
+    <div class="header-right">
+      <a href="subscription.html">Подписка</a>
+      <span>&#128100; Пользователь</span>
+    </div>
+  </div>
+
+  <div class="layout-sidebar">
+    <nav class="sidebar">
+      <a href="dashboard-active.html">&#128202; Дашборд</a>
+      <a href="agent-soul.html">&#128100; Личность (SOUL.md)</a>
+      <a href="agent-rules.html">&#128220; Правила (AGENT.md)</a>
+      <a href="agent-skills.html">&#9889; Задачи и скиллы</a>
+      <a href="agent-tools.html">&#128295; Инструменты</a>
+      <a href="agent-channel.html">&#128172; Канал связи</a>
+      <a href="subscription.html">&#128179; Подписка</a>
+      <a href="support.html" class="active">&#128488; Поддержка</a>
+    </nav>
+
+    <div class="main-content">
+      <div class="breadcrumb">
+        <a href="index.html">Карта</a> / <a href="dashboard-active.html">ЛК</a> / <span>Техподдержка</span>
+      </div>
+
+      <!-- Form state -->
+      <div id="support-form">
+        <h1>Техподдержка</h1>
+        <p>Опишите проблему — мы свяжемся с вами в течение 24 часов.</p>
+
+        <div class="card mt-24" style="max-width:600px;">
+          <div class="form-group">
+            <label>Тема обращения</label>
+            <select class="form-input" id="support-topic">
+              <option value="">Выберите тему...</option>
+              <option value="agent">Проблема с агентом</option>
+              <option value="payment">Проблема с оплатой</option>
+              <option value="integration">Ошибка интеграции</option>
+              <option value="channel">Проблема с каналом связи</option>
+              <option value="other">Другое</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Описание проблемы</label>
+            <textarea class="form-input" rows="6" id="support-desc" placeholder="Расскажите подробнее, что произошло..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Как с вами связаться?</label>
+            <div style="display:flex;flex-direction:column;gap:8px;" id="contact-method">
+              <label class="radio-card" style="padding:10px 16px;">
+                <input type="radio" name="contact" value="telegram" checked>
+                <span>Telegram</span>
+              </label>
+              <label class="radio-card" style="padding:10px 16px;">
+                <input type="radio" name="contact" value="email">
+                <span>Email</span>
+              </label>
+              <label class="radio-card" style="padding:10px 16px;">
+                <input type="radio" name="contact" value="phone">
+                <span>Телефон</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Контакт для связи</label>
+            <input type="text" class="form-input" id="support-contact" placeholder="@username / email / +7..." value="@irina_bloom">
+          </div>
+
+          <button class="btn btn--primary" onclick="submitSupport()">Отправить заявку</button>
+        </div>
+      </div>
+
+      <!-- Success state -->
+      <div id="support-success" class="hidden">
+        <div style="text-align:center;padding:60px 0;">
+          <div style="font-size:48px;margin-bottom:16px;">&#9989;</div>
+          <h1>Заявка #12345 отправлена</h1>
+          <p style="font-size:16px;color:#555;margin:16px 0;">Мы свяжемся с вами в течение 24 часов.</p>
+          <p class="text-muted">Ответим через выбранный канал связи.</p>
+          <div style="margin-top:32px;display:flex;gap:12px;justify-content:center;">
+            <button class="btn" onclick="resetSupport()">Отправить ещё одну заявку</button>
+            <a href="dashboard-active.html" class="btn btn--primary">Вернуться в ЛК</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function submitSupport() {
+      var topic = document.getElementById('support-topic').value;
+      var desc = document.getElementById('support-desc').value;
+
+      if (!topic) {
+        alert('Выберите тему обращения');
+        return;
+      }
+      if (!desc.trim()) {
+        alert('Опишите проблему');
+        return;
+      }
+
+      document.getElementById('support-form').classList.add('hidden');
+      document.getElementById('support-success').classList.remove('hidden');
+    }
+
+    function resetSupport() {
+      document.getElementById('support-form').classList.remove('hidden');
+      document.getElementById('support-success').classList.add('hidden');
+      document.getElementById('support-topic').value = '';
+      document.getElementById('support-desc').value = '';
+    }
+  </script>
+</body>
+</html>

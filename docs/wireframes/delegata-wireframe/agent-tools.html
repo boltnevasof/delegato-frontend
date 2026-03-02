@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — Инструменты</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <a href="index.html" class="header-logo">Delegata</a>
+    <div class="header-right">
+      <a href="subscription.html">Подписка</a>
+      <span>&#128100; Пользователь</span>
+    </div>
+  </div>
+
+  <div class="layout-sidebar">
+    <nav class="sidebar">
+      <a href="dashboard-active.html">&#128202; Дашборд</a>
+      <a href="agent-soul.html">&#128100; Личность (SOUL.md)</a>
+      <a href="agent-rules.html">&#128220; Правила (AGENT.md)</a>
+      <a href="agent-skills.html">&#9889; Задачи и скиллы</a>
+      <a href="agent-tools.html" class="active">&#128295; Инструменты</a>
+      <a href="agent-channel.html">&#128172; Канал связи</a>
+      <a href="subscription.html">&#128179; Подписка</a>
+      <a href="support.html">&#128488; Поддержка</a>
+    </nav>
+
+    <div class="main-content" style="max-width:1100px;">
+      <div class="breadcrumb">
+        <a href="index.html">Карта</a> / <a href="dashboard-active.html">ЛК</a> / <span>Инструменты</span>
+      </div>
+
+      <h1 class="mb-24">Инструменты и интеграции</h1>
+
+      <!-- Connected tools -->
+      <h3 class="mb-16">Подключённые</h3>
+      <div class="grid grid--3 mb-32" id="connected-tools">
+
+        <div class="tool-card connected" id="active-gcal">
+          <div class="tool-icon">&#128197;</div>
+          <div class="tool-name">Google Calendar</div>
+          <div class="tool-desc">Синхронизация встреч и событий</div>
+          <div style="margin-top:8px;">
+            <span style="color:#2a7a2a;font-weight:600;font-size:13px;">&#10003; Подключён</span>
+          </div>
+          <div class="skill-actions mt-8">
+            <button class="btn btn--small" onclick="showToolDetailModal('gcal')">Подробнее</button>
+            <button class="btn btn--small btn--danger" onclick="disconnectTool('gcal')">Отключить</button>
+          </div>
+        </div>
+
+        <div class="tool-card connected" id="active-search">
+          <div class="tool-icon">&#128269;</div>
+          <div class="tool-name">Поиск в интернете</div>
+          <div class="tool-desc">Поиск информации по запросу</div>
+          <div style="margin-top:8px;">
+            <span style="color:#2a7a2a;font-weight:600;font-size:13px;">&#10003; Активен</span>
+          </div>
+          <div class="skill-actions mt-8">
+            <button class="btn btn--small" onclick="showToolDetailModal('search')">Подробнее</button>
+            <button class="btn btn--small btn--danger" onclick="disconnectTool('search')">Отключить</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Available tools -->
+      <h3 class="mb-16">Доступные инструменты</h3>
+      <div class="grid grid--3" id="available-tools">
+
+        <div class="tool-card" id="avail-gdrive">
+          <div class="tool-icon">&#128193;</div>
+          <div class="tool-name">Google Drive</div>
+          <div class="tool-desc">Доступ к документам и файлам</div>
+          <div class="skill-actions mt-8">
+            <button class="btn btn--small" onclick="showToolDetailModal('gdrive')">Подробнее</button>
+            <button class="btn btn--small btn--primary" onclick="showConnectModal('gdrive')">Подключить</button>
+          </div>
+        </div>
+
+        <div class="tool-card" id="avail-notion">
+          <div class="tool-icon">&#128221;</div>
+          <div class="tool-name">Notion</div>
+          <div class="tool-desc">Заметки, базы данных, задачи</div>
+          <div class="skill-actions mt-8">
+            <button class="btn btn--small" onclick="showToolDetailModal('notion')">Подробнее</button>
+            <button class="btn btn--small btn--primary" onclick="showConnectModal('notion')">Подключить</button>
+          </div>
+        </div>
+
+        <div class="tool-card" id="avail-gsheets">
+          <div class="tool-icon">&#128202;</div>
+          <div class="tool-name">Google Sheets</div>
+          <div class="tool-desc">Работа с таблицами</div>
+          <div class="skill-actions mt-8">
+            <button class="btn btn--small" onclick="showToolDetailModal('gsheets')">Подробнее</button>
+            <button class="btn btn--small btn--primary" onclick="showConnectModal('gsheets')">Подключить</button>
+          </div>
+        </div>
+
+        <div class="tool-card disabled" id="avail-email">
+          <div class="tool-icon">&#128231;</div>
+          <div class="tool-name">Email (IMAP)</div>
+          <div class="tool-desc">Чтение и отправка писем</div>
+          <div style="margin-top:8px;">
+            <span class="badge badge--soon">Скоро</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Detail modal -->
+      <div class="modal-overlay" id="tool-detail-modal">
+        <div class="modal" style="max-width:520px;">
+          <div class="flex-between mb-16">
+            <h3 style="margin-bottom:0;" id="tool-modal-title"></h3>
+            <button class="btn btn--small" onclick="hideToolDetailModal()">Закрыть</button>
+          </div>
+          <div id="tool-modal-body"></div>
+        </div>
+      </div>
+
+      <!-- Connect modal -->
+      <div class="modal-overlay" id="connect-modal">
+        <div class="modal" style="max-width:480px;">
+          <div class="flex-between mb-16">
+            <h3 style="margin-bottom:0;" id="connect-modal-title">Подключение</h3>
+            <button class="btn btn--small" onclick="hideConnectModal()">Закрыть</button>
+          </div>
+          <div id="connect-modal-body"></div>
+        </div>
+      </div>
+
+      <!-- Result modal (success / error) -->
+      <div class="modal-overlay" id="result-modal">
+        <div class="modal" style="max-width:400px;text-align:center;">
+          <div id="result-icon" style="font-size:48px;margin-bottom:12px;"></div>
+          <h3 id="result-title" style="margin-bottom:8px;"></h3>
+          <p id="result-desc" style="color:#666;font-size:14px;"></p>
+          <div id="result-actions" style="margin-top:24px;display:flex;gap:10px;justify-content:center;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var toolData = {
+      gcal: {
+        icon: '&#128197;', name: 'Google Calendar',
+        desc: 'Синхронизация встреч и событий из Google Calendar. Агент видит ваше расписание и может планировать день с учётом встреч.',
+        features: ['Автоматическая сводка встреч на день', 'Напоминания перед встречами', 'Учёт расписания при планировании']
+      },
+      search: {
+        icon: '&#128269;', name: 'Поиск в интернете',
+        desc: 'Агент может искать информацию в интернете по вашему запросу и возвращать структурированные ответы.',
+        features: ['Поиск по ключевым словам', 'Сводка результатов', 'Ссылки на источники']
+      },
+      gdrive: {
+        icon: '&#128193;', name: 'Google Drive',
+        desc: 'Доступ к вашим документам и файлам в Google Drive. Агент может находить, читать и создавать документы.',
+        features: ['Поиск файлов по названию', 'Чтение содержимого документов', 'Создание новых документов'],
+        connect: '<ol><li>Нажмите «Авторизовать» ниже</li><li>В окне Google выберите аккаунт</li><li>Выберите папки для доступа</li></ol><button class="btn btn--primary btn--small mt-8" onclick="confirmConnect(\'gdrive\')">Авторизовать Google</button>'
+      },
+      notion: {
+        icon: '&#128221;', name: 'Notion',
+        desc: 'Интеграция с Notion для работы с заметками, базами данных и задачами.',
+        features: ['Чтение и создание страниц', 'Работа с базами данных', 'Управление задачами'],
+        connect: '<ol><li>Откройте Notion &rarr; Settings &rarr; Integrations</li><li>Создайте новую интеграцию</li><li>Скопируйте Integration Token</li></ol><input type="text" class="form-input mt-8" placeholder="Вставьте Integration Token" style="font-size:13px;"><button class="btn btn--primary btn--small mt-8" onclick="confirmConnect(\'notion\')">Подключить Notion</button>'
+      },
+      gsheets: {
+        icon: '&#128202;', name: 'Google Sheets',
+        desc: 'Работа с таблицами Google Sheets. Агент может читать данные, обновлять ячейки и создавать отчёты.',
+        features: ['Чтение данных из таблиц', 'Обновление ячеек', 'Создание сводных отчётов'],
+        connect: '<ol><li>Нажмите «Авторизовать» ниже</li><li>В окне Google выберите аккаунт</li><li>Подтвердите доступ к таблицам</li></ol><button class="btn btn--primary btn--small mt-8" onclick="confirmConnect(\'gsheets\')">Авторизовать Google</button>'
+      }
+    };
+
+    function showToolDetailModal(id) {
+      var d = toolData[id];
+      document.getElementById('tool-modal-title').innerHTML = d.icon + ' ' + d.name;
+      document.getElementById('tool-modal-body').innerHTML =
+        '<p style="margin-bottom:12px;">' + d.desc + '</p>' +
+        '<p style="font-weight:600;margin-bottom:8px;font-size:14px;">Возможности:</p>' +
+        '<ul style="list-style:none;padding:0;">' +
+        d.features.map(function(f) { return '<li style="padding:4px 0;font-size:14px;color:#555;">&bull; ' + f + '</li>'; }).join('') +
+        '</ul>';
+      document.getElementById('tool-detail-modal').classList.add('show');
+    }
+    function hideToolDetailModal() {
+      document.getElementById('tool-detail-modal').classList.remove('show');
+    }
+
+    function showConnectModal(id) {
+      var d = toolData[id];
+      document.getElementById('connect-modal-title').innerHTML = 'Подключение: ' + d.name;
+      document.getElementById('connect-modal-body').innerHTML = d.connect;
+      document.getElementById('connect-modal').classList.add('show');
+    }
+    function hideConnectModal() {
+      document.getElementById('connect-modal').classList.remove('show');
+    }
+
+    function showResultModal(type, name, id) {
+      var icon = document.getElementById('result-icon');
+      var title = document.getElementById('result-title');
+      var desc = document.getElementById('result-desc');
+      var actions = document.getElementById('result-actions');
+
+      if (type === 'success') {
+        icon.innerHTML = '&#9989;';
+        title.textContent = name + ' подключён';
+        title.style.color = '#2a7a2a';
+        desc.textContent = 'Инструмент успешно подключён вашему агенту.';
+        actions.innerHTML = '<button class="btn btn--primary" onclick="hideResultModal()">Отлично</button>';
+      } else {
+        icon.innerHTML = '&#10060;';
+        title.textContent = 'Не удалось подключить';
+        title.style.color = '#a00';
+        desc.textContent = 'Произошла ошибка при подключении инструмента «' + name + '».';
+        actions.innerHTML =
+          '<button class="btn btn--primary" onclick="hideResultModal(); showConnectModal(\'' + id + '\')" >Попробовать снова</button>' +
+          '<a href="support.html" class="btn">Нужна помощь?</a>' +
+          '<button class="btn btn--link" onclick="hideResultModal()">Закрыть</button>';
+      }
+      document.getElementById('result-modal').classList.add('show');
+    }
+
+    function hideResultModal() {
+      document.getElementById('result-modal').classList.remove('show');
+    }
+
+    function confirmConnect(id) {
+      hideConnectModal();
+      var d = toolData[id];
+      var card = document.getElementById('avail-' + id);
+      card.classList.add('connected');
+      card.style.borderColor = '';
+      var actions = card.querySelector('.skill-actions');
+      actions.innerHTML = '<span style="color:#2a7a2a;font-weight:600;font-size:13px;">&#10003; Подключён</span>';
+      showResultModal('success', d.name, id);
+    }
+
+    function simulateConnectError(id) {
+      hideConnectModal();
+      var d = toolData[id];
+      showResultModal('error', d.name, id);
+    }
+
+    function disconnectTool(id) {
+      var card = document.getElementById('active-' + id);
+      card.classList.remove('connected');
+      card.style.opacity = '0.4';
+      var btn = card.querySelector('.btn--danger');
+      btn.textContent = 'Отключён';
+      btn.disabled = true;
+      btn.classList.remove('btn--danger');
+    }
+  </script>
+
+  <!-- Demo toggle -->
+  <div style="position:fixed;bottom:16px;right:16px;background:#fff;border:1px solid #ddd;border-radius:6px;padding:10px 14px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+    <span style="color:#999;">Демо:</span>
+    <button class="btn btn--small" onclick="simulateConnectError('gdrive')" style="font-size:11px;">Ошибка Drive</button>
+    <button class="btn btn--small" onclick="simulateConnectError('notion')" style="font-size:11px;">Ошибка Notion</button>
+  </div>
+</body>
+</html>

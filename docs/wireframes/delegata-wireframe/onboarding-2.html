@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — Шаг 2: Канал связи</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="breadcrumb">
+      <a href="index.html">Карта</a> / <span>Онбординг — Шаг 2</span>
+    </div>
+
+    <div class="onboarding-wrap">
+      <!-- Progress -->
+      <div class="progress">
+        <div class="progress-step active"></div>
+        <div class="progress-line active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-line"></div>
+        <div class="progress-step"></div>
+        <div class="progress-line"></div>
+        <div class="progress-step"></div>
+        <div class="progress-line"></div>
+        <div class="progress-step"></div>
+        <span class="progress-label">Шаг 2 из 5</span>
+      </div>
+
+      <h1>Подключите канал связи</h1>
+      <p>Через этот канал вы будете общаться с агентом.</p>
+
+      <div class="mt-24">
+        <!-- Telegram -->
+        <div class="card" id="tg-card">
+          <div class="flex-between">
+            <div>
+              <h3>&#128172; Telegram <span class="badge badge--success">Рекомендуем</span></h3>
+              <p class="text-muted text-small">Основной канал для общения с агентом</p>
+            </div>
+            <div id="tg-actions">
+              <button class="btn btn--primary btn--small" onclick="connectTelegram()">Подключить</button>
+            </div>
+          </div>
+          <!-- TG Instructions (hidden) -->
+          <div id="tg-instructions" class="hidden mt-16" style="padding:16px;background:#f9f9f9;border-radius:6px;">
+            <p style="font-weight:600;margin-bottom:12px;">Подключение Telegram:</p>
+            <div style="display:flex;gap:20px;align-items:flex-start;">
+              <div style="width:120px;height:120px;background:#e0e0e0;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#999;">QR-код</div>
+              <div>
+                <ol style="font-size:14px;color:#555;padding-left:18px;">
+                  <li>Откройте Telegram</li>
+                  <li>Найдите бота @DelegataBot</li>
+                  <li>Нажмите /start</li>
+                  <li>Отправьте код: <strong>DLG-7X92K</strong></li>
+                </ol>
+                <button class="btn btn--primary btn--small mt-16" onclick="finishConnect()">Готово, я подключил</button>
+              </div>
+            </div>
+          </div>
+          <!-- Connected state -->
+          <div id="tg-connected" class="hidden mt-16">
+            <span style="color:#2a7a2a;font-weight:600;">&#10003; Telegram подключён</span>
+          </div>
+          <!-- Error state -->
+          <div id="tg-error" class="hidden mt-16">
+            <div class="error-banner show">
+              <strong>Не удалось подключить Telegram</strong>
+              Убедитесь, что вы отправили код боту @DelegataBot и попробуйте снова.
+              <div class="error-actions">
+                <button class="btn btn--small" onclick="retryConnect()">Попробовать снова</button>
+                <button class="btn btn--small" onclick="newCode()">Получить новый код</button>
+                <a href="support.html" class="btn btn--small">Написать в поддержку</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp -->
+        <div class="card card--disabled mt-16">
+          <div class="flex-between">
+            <div>
+              <h3>WhatsApp <span class="badge badge--soon">Скоро</span></h3>
+              <p class="text-muted text-small">Появится в ближайших обновлениях</p>
+            </div>
+            <button class="btn btn--small" disabled>Подключить</button>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="card card--disabled mt-16">
+          <div class="flex-between">
+            <div>
+              <h3>Email <span class="badge badge--soon">Скоро</span></h3>
+              <p class="text-muted text-small">Появится в ближайших обновлениях</p>
+            </div>
+            <button class="btn btn--small" disabled>Подключить</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="onboarding-nav">
+        <a href="onboarding-1.html" class="btn">&larr; Назад</a>
+        <a href="onboarding-3.html" class="btn btn--primary">Далее &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function connectTelegram() {
+      document.getElementById('tg-instructions').classList.remove('hidden');
+      document.querySelector('#tg-actions button').classList.add('hidden');
+    }
+
+    function finishConnect() {
+      document.getElementById('tg-instructions').classList.add('hidden');
+      document.getElementById('tg-connected').classList.remove('hidden');
+      document.getElementById('tg-error').classList.add('hidden');
+      document.getElementById('tg-card').style.borderColor = '#2a7a2a';
+    }
+
+    function showTgError() {
+      document.getElementById('tg-instructions').classList.add('hidden');
+      document.getElementById('tg-connected').classList.add('hidden');
+      document.getElementById('tg-error').classList.remove('hidden');
+      document.getElementById('tg-card').style.borderColor = '#c00';
+    }
+
+    function retryConnect() {
+      document.getElementById('tg-error').classList.add('hidden');
+      document.getElementById('tg-card').style.borderColor = '#ddd';
+      connectTelegram();
+    }
+
+    function newCode() {
+      document.getElementById('tg-error').classList.add('hidden');
+      document.getElementById('tg-card').style.borderColor = '#ddd';
+      connectTelegram();
+    }
+  </script>
+
+  <!-- Demo toggle -->
+  <div style="position:fixed;bottom:16px;right:16px;background:#fff;border:1px solid #ddd;border-radius:6px;padding:10px 14px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+    <span style="color:#999;">Демо:</span>
+    <button class="btn btn--small" onclick="showTgError()" style="font-size:11px;">Показать ошибку TG</button>
+  </div>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — Шаг 3: Скиллы</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrap page-wrap--wide">
+    <div class="breadcrumb">
+      <a href="index.html">Карта</a> / <span>Онбординг — Шаг 3</span>
+    </div>
+
+    <div style="max-width:960px;margin:0 auto;">
+      <!-- Progress -->
+      <div class="progress">
+        <div class="progress-step active"></div>
+        <div class="progress-line active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-line active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-line"></div>
+        <div class="progress-step"></div>
+        <div class="progress-line"></div>
+        <div class="progress-step"></div>
+        <span class="progress-label">Шаг 3 из 5</span>
+      </div>
+
+      <h1>Что должен уметь ваш ассистент?</h1>
+      <p>Выберите скиллы из маркетплейса. Вы сможете изменить набор позже в личном кабинете.</p>
+
+      <!-- Presets -->
+      <h3 class="mt-24">Быстрый старт</h3>
+      <p class="text-muted text-small mb-16">Выберите шаблон — мы настроим скиллы под вашу сферу</p>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;" id="presets">
+        <label class="radio-card" style="flex:1;min-width:200px;" onclick="selectPreset('beauty')">
+          <input type="radio" name="preset" value="beauty">
+          <div>
+            <strong>&#128135; Beauty / Услуги</strong>
+            <div class="text-muted text-small">Запись, напоминания, утренний план</div>
+          </div>
+        </label>
+        <label class="radio-card" style="flex:1;min-width:200px;" onclick="selectPreset('education')">
+          <input type="radio" name="preset" value="education">
+          <div>
+            <strong>&#128218; Обучение</strong>
+            <div class="text-muted text-small">Расписание, напоминания, контент</div>
+          </div>
+        </label>
+        <label class="radio-card" style="flex:1;min-width:200px;" onclick="selectPreset('ecom')">
+          <input type="radio" name="preset" value="ecom">
+          <div>
+            <strong>&#128722; Торговля</strong>
+            <div class="text-muted text-small">Заказы, поставщики, ресёрч цен</div>
+          </div>
+        </label>
+        <label class="radio-card" style="flex:1;min-width:200px;" onclick="selectPreset('universal')">
+          <input type="radio" name="preset" value="universal">
+          <div>
+            <strong>&#128203; Универсальный</strong>
+            <div class="text-muted text-small">Брифинг, напоминания, ресёрч</div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Skills Grid -->
+      <h3 class="mt-32 mb-16">Все скиллы</h3>
+
+      <div class="grid grid--3" id="skills-grid">
+
+        <div class="skill-card" id="skill-briefing">
+          <div class="skill-icon">&#9728;</div>
+          <div class="skill-name">Утренний брифинг</div>
+          <div class="skill-desc">План дня, встречи, задачи</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('briefing')">Подробнее</button>
+            <button class="btn btn--small btn--primary" onclick="toggleSkill('briefing')">Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card" id="skill-evening">
+          <div class="skill-icon">&#127769;</div>
+          <div class="skill-name">Вечерний отчёт</div>
+          <div class="skill-desc">Итоги дня, что выполнено</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('evening')">Подробнее</button>
+            <button class="btn btn--small btn--primary" onclick="toggleSkill('evening')">Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card" id="skill-reminders">
+          <div class="skill-icon">&#9200;</div>
+          <div class="skill-name">Напоминания</div>
+          <div class="skill-desc">Разовые и регулярные напоминания</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('reminders')">Подробнее</button>
+            <button class="btn btn--small btn--primary" onclick="toggleSkill('reminders')">Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card" id="skill-research">
+          <div class="skill-icon">&#128269;</div>
+          <div class="skill-name">Поиск информации</div>
+          <div class="skill-desc">Ресёрч по запросу в интернете</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('research')">Подробнее</button>
+            <button class="btn btn--small btn--primary" onclick="toggleSkill('research')">Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card" id="skill-inbox">
+          <div class="skill-icon">&#128229;</div>
+          <div class="skill-name">Сортировка входящих</div>
+          <div class="skill-desc">Приоритизация сообщений</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('inbox')">Подробнее</button>
+            <button class="btn btn--small btn--primary" onclick="toggleSkill('inbox')">Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card disabled" id="skill-clients">
+          <span class="badge badge--plan">Тариф Ассистент</span>
+          <div class="skill-icon">&#128172;</div>
+          <div class="skill-name">Ответы клиентам</div>
+          <div class="skill-desc">FAQ, обратная связь, консультации</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('clients')">Подробнее</button>
+            <button class="btn btn--small" disabled>Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card disabled" id="skill-booking">
+          <span class="badge badge--plan">Тариф Ассистент</span>
+          <div class="skill-icon">&#128197;</div>
+          <div class="skill-name">Запись на услуги</div>
+          <div class="skill-desc">Бронирование и управление записями</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('booking')">Подробнее</button>
+            <button class="btn btn--small" disabled>Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card disabled" id="skill-followup">
+          <span class="badge badge--plan">Тариф Ассистент</span>
+          <div class="skill-icon">&#128140;</div>
+          <div class="skill-name">Follow-up клиентам</div>
+          <div class="skill-desc">Автоматические касания после визита</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('followup')">Подробнее</button>
+            <button class="btn btn--small" disabled>Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card" id="skill-competitors">
+          <div class="skill-icon">&#128065;</div>
+          <div class="skill-name">Мониторинг конкурентов</div>
+          <div class="skill-desc">Отслеживание цен и активности</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('competitors')">Подробнее</button>
+            <button class="btn btn--small btn--primary" onclick="toggleSkill('competitors')">Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card" id="skill-content">
+          <div class="skill-icon">&#128221;</div>
+          <div class="skill-name">Контент-план</div>
+          <div class="skill-desc">Идеи постов и расписание публикаций</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('content')">Подробнее</button>
+            <button class="btn btn--small btn--primary" onclick="toggleSkill('content')">Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card disabled" id="skill-weekly">
+          <span class="badge badge--plan">Тариф Кастом</span>
+          <div class="skill-icon">&#128202;</div>
+          <div class="skill-name">Еженедельный отчёт</div>
+          <div class="skill-desc">Метрики, сравнение, аномалии</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('weekly')">Подробнее</button>
+            <button class="btn btn--small" disabled>Подключить</button>
+          </div>
+        </div>
+
+        <div class="skill-card disabled" id="skill-analytics">
+          <span class="badge badge--plan">Тариф Кастом</span>
+          <div class="skill-icon">&#128200;</div>
+          <div class="skill-name">Аналитика метрик</div>
+          <div class="skill-desc">Дашборды, тренды, прогнозы</div>
+          <div class="skill-actions">
+            <button class="btn btn--small" onclick="showDetailModal('analytics')">Подробнее</button>
+            <button class="btn btn--small" disabled>Подключить</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="onboarding-nav">
+        <a href="onboarding-2.html" class="btn">&larr; Назад</a>
+        <a href="onboarding-4.html" class="btn btn--primary">Далее &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail modal -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal" style="max-width:520px;">
+      <div class="flex-between mb-16">
+        <h3 style="margin-bottom:0;" id="modal-title"></h3>
+        <button class="btn btn--small" onclick="hideDetailModal()">Закрыть</button>
+      </div>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Result modal (success / error) -->
+  <div class="modal-overlay" id="result-modal">
+    <div class="modal" style="max-width:400px;text-align:center;">
+      <div id="result-icon" style="font-size:48px;margin-bottom:12px;"></div>
+      <h3 id="result-title" style="margin-bottom:8px;"></h3>
+      <p id="result-desc" style="color:#666;font-size:14px;"></p>
+      <div id="result-actions" style="margin-top:24px;display:flex;gap:10px;justify-content:center;"></div>
+    </div>
+  </div>
+
+  <script>
+    var skillData = {
+      briefing: {
+        icon: '&#9728;', name: 'Утренний брифинг',
+        desc: 'Каждое утро агент отправляет структурированный план дня: встречи из календаря, задачи, напоминания и погоду.',
+        examples: ['Сводка встреч на день', 'Приоритетные задачи', 'Настраиваемое время отправки']
+      },
+      evening: {
+        icon: '&#127769;', name: 'Вечерний отчёт',
+        desc: 'Агент подводит итоги дня: выполненные задачи, отложенные дела, ключевые события и план на завтра.',
+        examples: ['Сводка выполненных задач', 'Незакрытые дела', 'Предварительный план на завтра']
+      },
+      reminders: {
+        icon: '&#9200;', name: 'Напоминания',
+        desc: 'Создавайте напоминания голосом или текстом. Агент запомнит и напомнит вовремя.',
+        examples: ['Разовые напоминания', 'Повторяющиеся (каждый день/неделю)', 'Привязка к событиям']
+      },
+      research: {
+        icon: '&#128269;', name: 'Поиск информации',
+        desc: 'Агент ищет информацию в интернете по вашему запросу и возвращает структурированный ответ с источниками.',
+        examples: ['Поиск цен и поставщиков', 'Анализ конкурентов', 'Сбор фактов и статистики']
+      },
+      inbox: {
+        icon: '&#128229;', name: 'Сортировка входящих',
+        desc: 'Агент анализирует входящие сообщения, определяет срочность и группирует по темам.',
+        examples: ['Автоматическая приоритизация', 'Группировка по категориям', 'Выделение срочных']
+      },
+      competitors: {
+        icon: '&#128065;', name: 'Мониторинг конкурентов',
+        desc: 'Агент периодически проверяет сайты и соцсети конкурентов, сообщает об изменениях цен, акциях и новинках.',
+        examples: ['Отслеживание цен конкурентов', 'Мониторинг акций и новинок', 'Еженедельная сводка']
+      },
+      content: {
+        icon: '&#128221;', name: 'Контент-план',
+        desc: 'Агент генерирует идеи для постов, составляет контент-план на неделю/месяц и напоминает о публикациях.',
+        examples: ['Генерация идей для постов', 'Расписание публикаций', 'Напоминания о постинге']
+      },
+      clients: {
+        icon: '&#128172;', name: 'Ответы клиентам',
+        desc: 'Агент отвечает на типовые вопросы клиентов, собирает обратную связь и перенаправляет сложные запросы вам.',
+        examples: ['Автоответы на FAQ', 'Сбор обратной связи', 'Эскалация сложных вопросов']
+      },
+      booking: {
+        icon: '&#128197;', name: 'Запись на услуги',
+        desc: 'Агент принимает записи от клиентов, проверяет свободные слоты и подтверждает бронирование.',
+        examples: ['Автоматическая проверка слотов', 'Подтверждение записи клиенту', 'Напоминание перед визитом']
+      },
+      followup: {
+        icon: '&#128140;', name: 'Follow-up клиентам',
+        desc: 'Агент отправляет follow-up сообщения клиентам после визита: благодарность, просьба об отзыве, предложение повторной записи.',
+        examples: ['Благодарность после визита', 'Просьба об отзыве', 'Предложение повторной записи']
+      },
+      weekly: {
+        icon: '&#128202;', name: 'Еженедельный отчёт',
+        desc: 'Агент собирает ключевые метрики за неделю, сравнивает с предыдущей и выделяет аномалии.',
+        examples: ['Автосбор метрик', 'Сравнение с прошлой неделей', 'Выявление аномалий']
+      },
+      analytics: {
+        icon: '&#128200;', name: 'Аналитика метрик',
+        desc: 'Агент анализирует бизнес-метрики, строит тренды и даёт рекомендации на основе данных.',
+        examples: ['Автоматические дашборды', 'Выявление трендов', 'Рекомендации по улучшению']
+      }
+    };
+
+    var presets = {
+      beauty: ['briefing', 'evening', 'reminders', 'inbox'],
+      education: ['briefing', 'reminders', 'research', 'content'],
+      ecom: ['briefing', 'research', 'inbox', 'competitors'],
+      universal: ['briefing', 'reminders', 'research', 'evening', 'inbox']
+    };
+
+    var enabledSkills = ['briefing','evening','reminders','research','inbox','competitors','content'];
+
+    function selectPreset(name) {
+      document.querySelectorAll('.radio-card').forEach(function(c) { c.classList.remove('selected'); });
+      document.querySelector('input[value="' + name + '"]').closest('.radio-card').classList.add('selected');
+      enabledSkills.forEach(function(id) {
+        var card = document.getElementById('skill-' + id);
+        var btn = card.querySelector('.skill-actions .btn:last-child');
+        if (presets[name].includes(id)) {
+          card.classList.add('added');
+          btn.textContent = 'Подключён';
+        } else {
+          card.classList.remove('added');
+          btn.textContent = 'Подключить';
+        }
+      });
+    }
+
+    function showDetailModal(id) {
+      var data = skillData[id];
+      document.getElementById('modal-title').innerHTML = data.icon + ' ' + data.name;
+      document.getElementById('modal-body').innerHTML =
+        '<p style="margin-bottom:12px;">' + data.desc + '</p>' +
+        '<p style="font-weight:600;margin-bottom:8px;font-size:14px;">Примеры использования:</p>' +
+        '<ul style="list-style:none;padding:0;">' +
+        data.examples.map(function(e) { return '<li style="padding:4px 0;font-size:14px;color:#555;">&bull; ' + e + '</li>'; }).join('') +
+        '</ul>';
+      document.getElementById('detail-modal').classList.add('show');
+    }
+
+    function hideDetailModal() {
+      document.getElementById('detail-modal').classList.remove('show');
+    }
+
+    function showResultModal(type, name, id) {
+      var icon = document.getElementById('result-icon');
+      var title = document.getElementById('result-title');
+      var desc = document.getElementById('result-desc');
+      var actions = document.getElementById('result-actions');
+
+      if (type === 'success') {
+        icon.innerHTML = '&#9989;';
+        title.textContent = name + ' подключён';
+        title.style.color = '#2a7a2a';
+        desc.textContent = 'Скилл успешно добавлен вашему агенту.';
+        actions.innerHTML = '<button class="btn btn--primary" onclick="hideResultModal()">Отлично</button>';
+      } else {
+        icon.innerHTML = '&#10060;';
+        title.textContent = 'Не удалось подключить';
+        title.style.color = '#a00';
+        desc.textContent = 'Произошла ошибка при подключении скилла «' + name + '».';
+        actions.innerHTML =
+          '<button class="btn btn--primary" onclick="hideResultModal(); toggleSkill(\'' + id + '\')" >Попробовать снова</button>' +
+          '<a href="support.html" class="btn">Нужна помощь?</a>' +
+          '<button class="btn btn--link" onclick="hideResultModal()">Закрыть</button>';
+      }
+      document.getElementById('result-modal').classList.add('show');
+    }
+
+    function hideResultModal() {
+      document.getElementById('result-modal').classList.remove('show');
+    }
+
+    function toggleSkill(id) {
+      var card = document.getElementById('skill-' + id);
+      var btn = card.querySelector('.skill-actions .btn:last-child');
+      if (card.classList.contains('added')) {
+        card.classList.remove('added');
+        btn.textContent = 'Подключить';
+      } else {
+        card.classList.add('added');
+        btn.textContent = 'Подключён';
+        showResultModal('success', skillData[id].name, id);
+      }
+    }
+
+    function simulateSkillError(id) {
+      showResultModal('error', skillData[id].name, id);
+    }
+  </script>
+
+  <!-- Demo toggle -->
+  <div style="position:fixed;bottom:16px;right:16px;background:#fff;border:1px solid #ddd;border-radius:6px;padding:10px 14px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+    <span style="color:#999;">Демо:</span>
+    <button class="btn btn--small" onclick="simulateSkillError('competitors')" style="font-size:11px;">Ошибка подключения</button>
+  </div>
+</body>
+</html>

@@ -1,0 +1,3966 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Delegato Backend",
+    "description": "SaaS-платформа для управления AI-агентами, развёрнутыми на выделенных серверах клиентов.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/v1/auth/email/send-otp": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Отправить OTP-код на email",
+        "description": "Генерирует одноразовый код и отправляет его на указанный email через Unisender. Лимит: 5 запросов в минуту.",
+        "operationId": "send_otp_api_v1_auth_email_send_otp_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPSendRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OTPSendResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/email/verify-otp": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Подтвердить OTP-код",
+        "description": "Проверяет OTP-код и возвращает JWT access/refresh токены. Если пользователь не существует — создаётся автоматически. Лимит: 10 запросов в минуту.",
+        "operationId": "verify_otp_api_v1_auth_email_verify_otp_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OTPVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/google/initiate": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Начать Google OAuth",
+        "description": "Перенаправляет (302) на страницу авторизации Google. Используется как первый шаг OAuth2 flow.",
+        "operationId": "google_initiate_api_v1_auth_google_initiate_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/google/callback": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Callback Google OAuth",
+        "description": "Обрабатывает ответ Google после авторизации. Создаёт или находит пользователя и возвращает JWT токены.",
+        "operationId": "google_callback_api_v1_auth_google_callback_get",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "State"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/telegram/verify": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Авторизация через Telegram",
+        "description": "Проверяет данные Telegram Login Widget (hash-подпись). Создаёт или находит пользователя и возвращает JWT токены.",
+        "operationId": "telegram_verify_api_v1_auth_telegram_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelegramAuthRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/token/refresh": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Обновить JWT токены",
+        "description": "Принимает refresh-токен и возвращает новую пару access/refresh токенов. Старый refresh-токен инвалидируется.",
+        "operationId": "refresh_token_api_v1_auth_token_refresh_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/me": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "summary": "Получить профиль",
+        "description": "Возвращает профиль текущего пользователя: данные аккаунта, методы авторизации, агента и подписку.",
+        "operationId": "get_profile_api_v1_users_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfileResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/tariffs": {
+      "get": {
+        "tags": [
+          "tariffs"
+        ],
+        "summary": "Список тарифов",
+        "description": "Возвращает все доступные тарифные планы с ценами, лимитами каналов, LLM-моделью и уровнем доступа к навыкам.",
+        "operationId": "list_tariffs_api_v1_tariffs_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TariffListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tariffs/custom/request": {
+      "post": {
+        "tags": [
+          "tariffs"
+        ],
+        "summary": "Заявка на кастомный тариф",
+        "description": "Создаёт заявку на индивидуальный тарифный план. Менеджер свяжется с пользователем по указанным контактам.",
+        "operationId": "create_custom_request_api_v1_tariffs_custom_request_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomTariffRequestCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomTariffRequestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/payments/subscribe": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Создать подписку",
+        "description": "Инициирует оплату выбранного тарифа. Возвращает URL платёжной страницы, на которую нужно перенаправить пользователя.",
+        "operationId": "subscribe_api_v1_payments_subscribe_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscribeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/payments/webhook": {
+      "post": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "Вебхук платёжной системы",
+        "description": "Принимает уведомления от платёжного провайдера (TBank / YooKassa). Проверяет подпись и обновляет статус платежа и подписки.",
+        "operationId": "payment_webhook_api_v1_payments_webhook_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payments/history": {
+      "get": {
+        "tags": [
+          "payments"
+        ],
+        "summary": "История платежей",
+        "description": "Возвращает постраничный список всех платежей текущего пользователя с суммой, статусом и датой.",
+        "operationId": "payment_history_api_v1_payments_history_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Page number",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "Page number"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Items per page",
+              "default": 20,
+              "title": "Per Page"
+            },
+            "description": "Items per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentHistoryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents/me": {
+      "get": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Получить агента",
+        "description": "Возвращает полную информацию об AI-агенте текущего пользователя: статус, SOUL.md, навыки, инструменты, каналы и сервер.",
+        "operationId": "get_agent_api_v1_agents_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentDetailResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/onboarding/describe": {
+      "post": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Онбординг: описать бизнес",
+        "description": "Принимает текстовое описание бизнеса и запускает фоновую AI-задачу для генерации SOUL.md и AGENT.md. Возвращает task_id для отслеживания.",
+        "operationId": "onboarding_describe_api_v1_agents_onboarding_describe_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnboardingDescribeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncTaskAcceptedResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/onboarding/skip-describe": {
+      "post": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Онбординг: пропустить описание",
+        "description": "Пропускает шаг генерации SOUL.md из описания бизнеса. Пользователь сможет заполнить SOUL.md вручную позже.",
+        "operationId": "onboarding_skip_describe_api_v1_agents_onboarding_skip_describe_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Onboarding Skip Describe Api V1 Agents Onboarding Skip Describe Post"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/tasks/{task_id}/status": {
+      "get": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Статус фоновой задачи",
+        "description": "Проверяет статус асинхронной задачи (AI-генерация, enhance). Возвращает pending / completed / failed.",
+        "operationId": "get_task_status_api_v1_agents_tasks__task_id__status_get",
+        "parameters": [
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Task Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncTaskStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents/onboarding/connect-channel": {
+      "post": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Онбординг: подключить канал",
+        "description": "Подключает канал связи (Telegram) к агенту на этапе онбординга. Автоматически переводит онбординг на следующий шаг.",
+        "operationId": "onboarding_connect_channel_api_v1_agents_onboarding_connect_channel_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnboardingConnectChannelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingConnectChannelResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/onboarding/select-skills": {
+      "post": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Онбординг: выбрать навыки",
+        "description": "Активирует выбранные навыки (по ID или пресету) для агента на этапе онбординга.",
+        "operationId": "onboarding_select_skills_api_v1_agents_onboarding_select_skills_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnboardingSelectSkillsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingSelectSkillsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/onboarding/complete": {
+      "post": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Онбординг: завершить",
+        "description": "Завершает онбординг агента и запускает провижининг сервера. Агент переходит в статус configuring.",
+        "operationId": "onboarding_complete_api_v1_agents_onboarding_complete_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingCompleteResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/me/soul-md": {
+      "put": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Обновить SOUL.md",
+        "description": "Заменяет содержимое SOUL.md агента. SOUL.md определяет личность, тон и поведение AI-агента.",
+        "operationId": "update_soul_md_api_v1_agents_me_soul_md_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SoulMdUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Update Soul Md Api V1 Agents Me Soul Md Put"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/me/agent-md": {
+      "put": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "Обновить AGENT.md",
+        "description": "Заменяет содержимое AGENT.md агента. AGENT.md определяет инструкции, бизнес-правила и контекст работы агента.",
+        "operationId": "update_agent_md_api_v1_agents_me_agent_md_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentMdUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Update Agent Md Api V1 Agents Me Agent Md Put"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/me/enhance": {
+      "post": {
+        "tags": [
+          "agents"
+        ],
+        "summary": "AI-улучшение контента",
+        "description": "Запускает фоновую AI-задачу для улучшения SOUL.md или AGENT.md. Возвращает task_id для отслеживания результата.",
+        "operationId": "enhance_content_api_v1_agents_me_enhance_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnhanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncTaskAcceptedResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/skills/catalog": {
+      "get": {
+        "tags": [
+          "skills"
+        ],
+        "summary": "Каталог навыков",
+        "description": "Возвращает полный каталог доступных навыков и пресеты (готовые наборы навыков).",
+        "operationId": "get_skill_catalog_api_v1_skills_catalog_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillCatalogResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/me/skills": {
+      "post": {
+        "tags": [
+          "skills"
+        ],
+        "summary": "Добавить навык агенту",
+        "description": "Активирует указанный навык из каталога для AI-агента текущего пользователя.",
+        "operationId": "add_skill_api_v1_agents_me_skills_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddSkillRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSkillResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/me/skills/{skill_id}": {
+      "patch": {
+        "tags": [
+          "skills"
+        ],
+        "summary": "Вкл/выкл навык",
+        "description": "Включает или выключает ранее добавленный навык агента без удаления.",
+        "operationId": "toggle_skill_api_v1_agents_me_skills__skill_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "skill_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Skill Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ToggleSkillRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentSkillResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "skills"
+        ],
+        "summary": "Удалить навык",
+        "description": "Полностью удаляет навык из агента. Для повторного использования потребуется добавить заново.",
+        "operationId": "remove_skill_api_v1_agents_me_skills__skill_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "skill_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Skill Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/tools/catalog": {
+      "get": {
+        "tags": [
+          "tools"
+        ],
+        "summary": "Каталог инструментов",
+        "description": "Возвращает список всех доступных инструментов (MCP-серверов, API-интеграций) для подключения к агенту.",
+        "operationId": "get_tool_catalog_api_v1_tools_catalog_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ToolCatalogResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/me/tools": {
+      "post": {
+        "tags": [
+          "tools"
+        ],
+        "summary": "Добавить инструмент агенту",
+        "description": "Подключает указанный инструмент из каталога к AI-агенту текущего пользователя.",
+        "operationId": "add_tool_api_v1_agents_me_tools_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToolRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentToolResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/me/tools/{tool_id}": {
+      "patch": {
+        "tags": [
+          "tools"
+        ],
+        "summary": "Вкл/выкл инструмент",
+        "description": "Включает или выключает ранее добавленный инструмент агента без удаления.",
+        "operationId": "toggle_tool_api_v1_agents_me_tools__tool_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tool_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tool Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ToggleToolRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentToolResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "tools"
+        ],
+        "summary": "Удалить инструмент",
+        "description": "Полностью отключает инструмент от агента. Для повторного использования потребуется добавить заново.",
+        "operationId": "remove_tool_api_v1_agents_me_tools__tool_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tool_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tool Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents/me/channels": {
+      "get": {
+        "tags": [
+          "channels"
+        ],
+        "summary": "Список каналов агента",
+        "description": "Возвращает все подключённые каналы связи (Telegram и др.) AI-агента текущего пользователя.",
+        "operationId": "get_channels_api_v1_agents_me_channels_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelListResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/agents/me/channels/{channel_id}": {
+      "patch": {
+        "tags": [
+          "channels"
+        ],
+        "summary": "Обновить канал",
+        "description": "Изменяет статус канала связи агента (подключён / отключён).",
+        "operationId": "update_channel_api_v1_agents_me_channels__channel_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "channel_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Channel Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateChannelRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChannelResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/subscriptions/current": {
+      "get": {
+        "tags": [
+          "subscriptions"
+        ],
+        "summary": "Текущая подписка",
+        "description": "Возвращает детали активной подписки пользователя: тариф, период, статус и причину отмены (если есть).",
+        "operationId": "get_current_subscription_api_v1_subscriptions_current_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionDetailResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions/change-tariff": {
+      "post": {
+        "tags": [
+          "subscriptions"
+        ],
+        "summary": "Сменить тариф",
+        "description": "Переключает подписку на другой тарифный план с расчётом пропорциональной доплаты/возврата за оставшийся период.",
+        "operationId": "change_tariff_api_v1_subscriptions_change_tariff_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeTariffRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeTariffResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions/cancel": {
+      "post": {
+        "tags": [
+          "subscriptions"
+        ],
+        "summary": "Отменить подписку",
+        "description": "Отменяет подписку. Доступ сохраняется до конца grace-периода, после чего сервер останавливается.",
+        "operationId": "cancel_subscription_api_v1_subscriptions_cancel_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelSubscriptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelSubscriptionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/subscriptions/reactivate": {
+      "post": {
+        "tags": [
+          "subscriptions"
+        ],
+        "summary": "Реактивировать подписку",
+        "description": "Возобновляет ранее отменённую подписку, если grace-период ещё не истёк.",
+        "operationId": "reactivate_subscription_api_v1_subscriptions_reactivate_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReactivateResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/servers/provision": {
+      "post": {
+        "tags": [
+          "servers"
+        ],
+        "summary": "Запустить провижининг сервера",
+        "description": "Создаёт агента и сервер для текущего пользователя, запускает фоновый провижининг (Terraform → VPS, Ansible → Docker + OpenClaw). Вызывается после оплаты. Сервер готовится параллельно с онбордингом.",
+        "operationId": "start_provision_api_v1_servers_provision_post",
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerProvisionResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/servers/me": {
+      "get": {
+        "tags": [
+          "servers"
+        ],
+        "summary": "Статус сервера",
+        "description": "Возвращает текущий статус выделенного сервера агента: IP-адрес, этап провижининга и дату создания.",
+        "operationId": "get_server_status_api_v1_servers_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerStatusResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/servers/me/logs": {
+      "get": {
+        "tags": [
+          "servers"
+        ],
+        "summary": "Логи сервера",
+        "description": "Возвращает постраничный список логов провижининга и конфигурации сервера. Можно фильтровать по уровню (info / warning / error).",
+        "operationId": "get_server_logs_api_v1_servers_me_logs_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по уровню: info, warning, error",
+              "title": "Level"
+            },
+            "description": "Фильтр по уровню: info, warning, error"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerLogListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Список пользователей",
+        "description": "Постраничный список всех пользователей платформы с поиском по email/имени.",
+        "operationId": "list_users_api_v1_admin_users_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Поиск по email или имени",
+              "title": "Search"
+            },
+            "description": "Поиск по email или имени"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/servers": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Список серверов",
+        "description": "Постраничный список всех серверов с возможностью фильтрации по статусу (provisioning, active, error и т.д.).",
+        "operationId": "list_servers_api_v1_admin_servers_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по статусу сервера",
+              "title": "Status"
+            },
+            "description": "Фильтр по статусу сервера"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminServerListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/servers/stats": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Статистика серверов",
+        "description": "Сводная статистика по серверам: общее количество, активные, в процессе провижининга, с ошибками, остановленные.",
+        "operationId": "get_server_stats_api_v1_admin_servers_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminServerStats"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/admin/servers/{server_id}/logs": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Логи сервера (по ID)",
+        "description": "Постраничные логи конкретного сервера. Фильтрация по уровню: info, warning, error.",
+        "operationId": "get_server_logs_api_v1_admin_servers__server_id__logs_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Server Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по уровню лога",
+              "title": "Level"
+            },
+            "description": "Фильтр по уровню лога"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerLogListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/agents": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Список агентов",
+        "description": "Постраничный список всех AI-агентов платформы с информацией о статусе и шаге онбординга.",
+        "operationId": "list_agents_api_v1_admin_agents_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminAgentListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/custom-requests": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Заявки на кастомный тариф",
+        "description": "Постраничный список заявок на индивидуальный тариф с фильтрацией по статусу (new, contacted, closed).",
+        "operationId": "list_custom_requests_api_v1_admin_custom_requests_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Per Page"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Фильтр по статусу заявки",
+              "title": "Status"
+            },
+            "description": "Фильтр по статусу заявки"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCustomRequestListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health check",
+        "description": "Проверяет доступность PostgreSQL и Redis. Возвращает 503 если хотя бы один компонент недоступен.",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddSkillRequest": {
+        "properties": {
+          "skill_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Skill Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "skill_id"
+        ],
+        "title": "AddSkillRequest"
+      },
+      "AddToolRequest": {
+        "properties": {
+          "tool_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tool Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tool_id"
+        ],
+        "title": "AddToolRequest"
+      },
+      "AdminAgentListItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "onboarding_step": {
+            "type": "integer",
+            "title": "Onboarding Step"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "status",
+          "onboarding_step",
+          "created_at"
+        ],
+        "title": "AdminAgentListItem"
+      },
+      "AdminAgentListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AdminAgentListItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "per_page": {
+            "type": "integer",
+            "title": "Per Page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "per_page"
+        ],
+        "title": "AdminAgentListResponse"
+      },
+      "AdminCustomRequestItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "User Id"
+          },
+          "contact_info": {
+            "type": "string",
+            "title": "Contact Info"
+          },
+          "requirements": {
+            "type": "string",
+            "title": "Requirements"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "contact_info",
+          "requirements",
+          "status",
+          "created_at"
+        ],
+        "title": "AdminCustomRequestItem"
+      },
+      "AdminCustomRequestListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AdminCustomRequestItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "per_page": {
+            "type": "integer",
+            "title": "Per Page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "per_page"
+        ],
+        "title": "AdminCustomRequestListResponse"
+      },
+      "AdminServerListItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "agent_id",
+          "status",
+          "ip_address",
+          "created_at"
+        ],
+        "title": "AdminServerListItem"
+      },
+      "AdminServerListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AdminServerListItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "per_page": {
+            "type": "integer",
+            "title": "Per Page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "per_page"
+        ],
+        "title": "AdminServerListResponse"
+      },
+      "AdminServerStats": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "active": {
+            "type": "integer",
+            "title": "Active"
+          },
+          "provisioning": {
+            "type": "integer",
+            "title": "Provisioning"
+          },
+          "error": {
+            "type": "integer",
+            "title": "Error"
+          },
+          "stopped": {
+            "type": "integer",
+            "title": "Stopped"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total",
+          "active",
+          "provisioning",
+          "error",
+          "stopped"
+        ],
+        "title": "AdminServerStats"
+      },
+      "AdminUserListItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "name",
+          "role",
+          "is_active",
+          "created_at"
+        ],
+        "title": "AdminUserListItem"
+      },
+      "AdminUserListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AdminUserListItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "per_page": {
+            "type": "integer",
+            "title": "Per Page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "per_page"
+        ],
+        "title": "AdminUserListResponse"
+      },
+      "AgentDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "soul_md": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soul Md"
+          },
+          "agent_md": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Md"
+          },
+          "onboarding_step": {
+            "type": "integer",
+            "title": "Onboarding Step"
+          },
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillSummary"
+            },
+            "type": "array",
+            "title": "Skills"
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/ToolSummary"
+            },
+            "type": "array",
+            "title": "Tools"
+          },
+          "channels": {
+            "items": {
+              "$ref": "#/components/schemas/ChannelSummary"
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "server": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ServerSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "soul_md",
+          "agent_md",
+          "onboarding_step",
+          "skills",
+          "tools",
+          "channels",
+          "server"
+        ],
+        "title": "AgentDetailResponse"
+      },
+      "AgentMdUpdateRequest": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "AgentMdUpdateRequest"
+      },
+      "AgentSkillResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "is_enabled": {
+            "type": "boolean",
+            "title": "Is Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "is_enabled"
+        ],
+        "title": "AgentSkillResponse"
+      },
+      "AgentSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "onboarding_step": {
+            "type": "integer",
+            "title": "Onboarding Step"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "onboarding_step"
+        ],
+        "title": "AgentSummary"
+      },
+      "AgentToolResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "is_enabled": {
+            "type": "boolean",
+            "title": "Is Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "is_enabled"
+        ],
+        "title": "AgentToolResponse"
+      },
+      "AsyncTaskAcceptedResponse": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "accepted"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": "AI generation started"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id"
+        ],
+        "title": "AsyncTaskAcceptedResponse"
+      },
+      "AsyncTaskStatusResponse": {
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "title": "Task Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "task_id",
+          "status"
+        ],
+        "title": "AsyncTaskStatusResponse"
+      },
+      "CancelSubscriptionRequest": {
+        "properties": {
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reason"
+        ],
+        "title": "CancelSubscriptionRequest"
+      },
+      "CancelSubscriptionResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "grace_period_end": {
+            "type": "string",
+            "title": "Grace Period End"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "grace_period_end",
+          "message"
+        ],
+        "title": "CancelSubscriptionResponse"
+      },
+      "ChangeTariffRequest": {
+        "properties": {
+          "tariff_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tariff Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tariff_id"
+        ],
+        "title": "ChangeTariffRequest"
+      },
+      "ChangeTariffResponse": {
+        "properties": {
+          "subscription": {
+            "$ref": "#/components/schemas/SubscriptionDetailResponse"
+          },
+          "proration_amount_rub": {
+            "type": "integer",
+            "title": "Proration Amount Rub"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "subscription",
+          "proration_amount_rub",
+          "message"
+        ],
+        "title": "ChangeTariffResponse"
+      },
+      "ChannelListResponse": {
+        "properties": {
+          "channels": {
+            "items": {
+              "$ref": "#/components/schemas/ChannelResponse"
+            },
+            "type": "array",
+            "title": "Channels"
+          }
+        },
+        "type": "object",
+        "required": [
+          "channels"
+        ],
+        "title": "ChannelListResponse"
+      },
+      "ChannelResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "channel_type": {
+            "type": "string",
+            "title": "Channel Type"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "channel_type",
+          "status"
+        ],
+        "title": "ChannelResponse"
+      },
+      "ChannelSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "status"
+        ],
+        "title": "ChannelSummary"
+      },
+      "CustomTariffRequestCreate": {
+        "properties": {
+          "contact_info": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Contact Info"
+          },
+          "requirements": {
+            "type": "string",
+            "title": "Requirements"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contact_info",
+          "requirements"
+        ],
+        "title": "CustomTariffRequestCreate"
+      },
+      "CustomTariffRequestResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": "Request received"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "CustomTariffRequestResponse"
+      },
+      "EnhanceRequest": {
+        "properties": {
+          "field": {
+            "type": "string",
+            "pattern": "^(soul_md|agent_md)$",
+            "title": "Field"
+          },
+          "content": {
+            "type": "string",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "field",
+          "content"
+        ],
+        "title": "EnhanceRequest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "MessageResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "MessageResponse"
+      },
+      "OTPSendRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "OTPSendRequest"
+      },
+      "OTPSendResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": "OTP sent"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In",
+            "default": 300
+          }
+        },
+        "type": "object",
+        "title": "OTPSendResponse"
+      },
+      "OTPVerifyRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 6,
+            "minLength": 6,
+            "title": "Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "code"
+        ],
+        "title": "OTPVerifyRequest"
+      },
+      "OnboardingCompleteResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "task_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "OnboardingCompleteResponse"
+      },
+      "OnboardingConnectChannelRequest": {
+        "properties": {
+          "channel_type": {
+            "type": "string",
+            "title": "Channel Type",
+            "default": "telegram"
+          },
+          "config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config"
+          }
+        },
+        "type": "object",
+        "required": [
+          "config"
+        ],
+        "title": "OnboardingConnectChannelRequest"
+      },
+      "OnboardingConnectChannelResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "channel_type": {
+            "type": "string",
+            "title": "Channel Type"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "channel_type",
+          "status"
+        ],
+        "title": "OnboardingConnectChannelResponse"
+      },
+      "OnboardingDescribeRequest": {
+        "properties": {
+          "business_description": {
+            "type": "string",
+            "title": "Business Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "business_description"
+        ],
+        "title": "OnboardingDescribeRequest"
+      },
+      "OnboardingSelectSkillsRequest": {
+        "properties": {
+          "skill_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Skill Ids"
+          },
+          "preset_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Preset Slug"
+          }
+        },
+        "type": "object",
+        "title": "OnboardingSelectSkillsRequest"
+      },
+      "OnboardingSelectSkillsResponse": {
+        "properties": {
+          "activated_skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillSummary"
+            },
+            "type": "array",
+            "title": "Activated Skills"
+          }
+        },
+        "type": "object",
+        "required": [
+          "activated_skills"
+        ],
+        "title": "OnboardingSelectSkillsResponse"
+      },
+      "PaymentHistoryItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "amount_rub": {
+            "type": "integer",
+            "title": "Amount Rub",
+            "description": "Amount in kopecks"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "amount_rub",
+          "status",
+          "created_at"
+        ],
+        "title": "PaymentHistoryItem"
+      },
+      "PaymentHistoryResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PaymentHistoryItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "per_page": {
+            "type": "integer",
+            "title": "Per Page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "per_page"
+        ],
+        "title": "PaymentHistoryResponse"
+      },
+      "ReactivateResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "ReactivateResponse"
+      },
+      "RefreshTokenRequest": {
+        "properties": {
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "refresh_token"
+        ],
+        "title": "RefreshTokenRequest"
+      },
+      "ServerLogItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "level": {
+            "type": "string",
+            "title": "Level"
+          },
+          "stage": {
+            "type": "string",
+            "title": "Stage"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "level",
+          "stage",
+          "message",
+          "created_at"
+        ],
+        "title": "ServerLogItem"
+      },
+      "ServerLogListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ServerLogItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "per_page": {
+            "type": "integer",
+            "title": "Per Page"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "per_page"
+        ],
+        "title": "ServerLogListResponse"
+      },
+      "ServerProvisionResponse": {
+        "properties": {
+          "server_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Server Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "server_id",
+          "status"
+        ],
+        "title": "ServerProvisionResponse"
+      },
+      "ServerStatusResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "ip_address",
+          "created_at"
+        ],
+        "title": "ServerStatusResponse"
+      },
+      "ServerSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "status",
+          "ip_address"
+        ],
+        "title": "ServerSummary"
+      },
+      "SkillCatalogItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "access_level": {
+            "type": "string",
+            "title": "Access Level"
+          },
+          "available_for_user": {
+            "type": "boolean",
+            "title": "Available For User"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "description",
+          "access_level",
+          "available_for_user"
+        ],
+        "title": "SkillCatalogItem"
+      },
+      "SkillCatalogResponse": {
+        "properties": {
+          "skills": {
+            "items": {
+              "$ref": "#/components/schemas/SkillCatalogItem"
+            },
+            "type": "array",
+            "title": "Skills"
+          },
+          "presets": {
+            "items": {
+              "$ref": "#/components/schemas/SkillPresetItem"
+            },
+            "type": "array",
+            "title": "Presets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "skills",
+          "presets"
+        ],
+        "title": "SkillCatalogResponse"
+      },
+      "SkillPresetItem": {
+        "properties": {
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "skill_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Skill Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "name",
+          "skill_ids"
+        ],
+        "title": "SkillPresetItem"
+      },
+      "SkillSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "is_enabled": {
+            "type": "boolean",
+            "title": "Is Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "is_enabled"
+        ],
+        "title": "SkillSummary"
+      },
+      "SoulMdUpdateRequest": {
+        "properties": {
+          "content": {
+            "type": "string",
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "title": "SoulMdUpdateRequest"
+      },
+      "SubscribeRequest": {
+        "properties": {
+          "tariff_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Tariff Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tariff_id"
+        ],
+        "title": "SubscribeRequest"
+      },
+      "SubscribeResponse": {
+        "properties": {
+          "payment_url": {
+            "type": "string",
+            "title": "Payment Url"
+          },
+          "payment_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Payment Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "payment_url",
+          "payment_id"
+        ],
+        "title": "SubscribeResponse"
+      },
+      "SubscriptionDetailResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "tariff": {
+            "$ref": "#/components/schemas/TariffSummary"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "current_period_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Current Period Start"
+          },
+          "current_period_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Current Period End"
+          },
+          "payment_method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payment Method"
+          },
+          "cancel_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancel Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tariff",
+          "status",
+          "current_period_start",
+          "current_period_end",
+          "payment_method",
+          "cancel_reason"
+        ],
+        "title": "SubscriptionDetailResponse"
+      },
+      "SubscriptionSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "tariff_slug": {
+            "type": "string",
+            "title": "Tariff Slug"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "current_period_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Current Period End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "tariff_slug",
+          "status",
+          "current_period_end"
+        ],
+        "title": "SubscriptionSummary"
+      },
+      "TariffListResponse": {
+        "properties": {
+          "tariffs": {
+            "items": {
+              "$ref": "#/components/schemas/TariffResponse"
+            },
+            "type": "array",
+            "title": "Tariffs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tariffs"
+        ],
+        "title": "TariffListResponse"
+      },
+      "TariffResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "price_rub": {
+            "type": "integer",
+            "title": "Price Rub",
+            "description": "Price in kopecks"
+          },
+          "max_channels": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Channels"
+          },
+          "llm_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Llm Model"
+          },
+          "skills_access": {
+            "type": "string",
+            "title": "Skills Access"
+          },
+          "is_self_service": {
+            "type": "boolean",
+            "title": "Is Self Service"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "price_rub",
+          "max_channels",
+          "llm_model",
+          "skills_access",
+          "is_self_service"
+        ],
+        "title": "TariffResponse"
+      },
+      "TariffSummary": {
+        "properties": {
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "price_rub": {
+            "type": "integer",
+            "title": "Price Rub"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "name",
+          "price_rub"
+        ],
+        "title": "TariffSummary"
+      },
+      "TelegramAuthRequest": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          },
+          "auth_date": {
+            "type": "integer",
+            "title": "Auth Date"
+          },
+          "hash": {
+            "type": "string",
+            "title": "Hash"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "first_name",
+          "auth_date",
+          "hash"
+        ],
+        "title": "TelegramAuthRequest"
+      },
+      "ToggleSkillRequest": {
+        "properties": {
+          "is_enabled": {
+            "type": "boolean",
+            "title": "Is Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_enabled"
+        ],
+        "title": "ToggleSkillRequest"
+      },
+      "ToggleToolRequest": {
+        "properties": {
+          "is_enabled": {
+            "type": "boolean",
+            "title": "Is Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_enabled"
+        ],
+        "title": "ToggleToolRequest"
+      },
+      "TokenResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "expires_in": {
+            "type": "integer",
+            "title": "Expires In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "refresh_token",
+          "expires_in"
+        ],
+        "title": "TokenResponse"
+      },
+      "ToolCatalogItem": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "description"
+        ],
+        "title": "ToolCatalogItem"
+      },
+      "ToolCatalogResponse": {
+        "properties": {
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/ToolCatalogItem"
+            },
+            "type": "array",
+            "title": "Tools"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tools"
+        ],
+        "title": "ToolCatalogResponse"
+      },
+      "ToolSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "is_enabled": {
+            "type": "boolean",
+            "title": "Is Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "slug",
+          "is_enabled"
+        ],
+        "title": "ToolSummary"
+      },
+      "UpdateChannelRequest": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "UpdateChannelRequest"
+      },
+      "UserProfileResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "auth_methods": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Auth Methods"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "agent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AgentSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subscription": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "name",
+          "role",
+          "auth_methods",
+          "created_at"
+        ],
+        "title": "UserProfileResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "health",
+      "description": "Проверка работоспособности сервиса и зависимостей."
+    },
+    {
+      "name": "auth",
+      "description": "Аутентификация: email OTP, Google OAuth, Telegram Login."
+    },
+    {
+      "name": "users",
+      "description": "Профиль текущего пользователя."
+    },
+    {
+      "name": "tariffs",
+      "description": "Каталог тарифных планов и заявки на кастомный тариф."
+    },
+    {
+      "name": "subscriptions",
+      "description": "Управление подпиской: смена тарифа, отмена, реактивация."
+    },
+    {
+      "name": "payments",
+      "description": "Оплата подписки, вебхуки платёжной системы, история платежей."
+    },
+    {
+      "name": "agents",
+      "description": "AI-агент пользователя: онбординг, настройка SOUL.md / AGENT.md, AI-улучшение."
+    },
+    {
+      "name": "skills",
+      "description": "Каталог навыков и управление навыками агента."
+    },
+    {
+      "name": "tools",
+      "description": "Каталог инструментов и управление инструментами агента."
+    },
+    {
+      "name": "channels",
+      "description": "Каналы связи агента (Telegram и др.)."
+    },
+    {
+      "name": "servers",
+      "description": "Статус сервера агента и логи провижининга."
+    },
+    {
+      "name": "admin",
+      "description": "Административная панель (требуется роль admin и IP whitelist)."
+    }
+  ]
+}

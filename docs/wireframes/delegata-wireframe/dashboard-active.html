@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — Личный кабинет</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <a href="index.html" class="header-logo">Delegata</a>
+    <div class="header-right">
+      <a href="subscription.html">Подписка</a>
+      <span>&#128100; Пользователь</span>
+    </div>
+  </div>
+
+  <div class="layout-sidebar">
+    <nav class="sidebar">
+      <a href="dashboard-active.html" class="active">&#128202; Дашборд</a>
+      <a href="agent-soul.html">&#128100; Личность (SOUL.md)</a>
+      <a href="agent-rules.html">&#128220; Правила (AGENT.md)</a>
+      <a href="agent-skills.html">&#9889; Задачи и скиллы</a>
+      <a href="agent-tools.html">&#128295; Инструменты</a>
+      <a href="agent-channel.html">&#128172; Канал связи</a>
+      <a href="subscription.html">&#128179; Подписка</a>
+      <a href="support.html">&#128488; Поддержка</a>
+    </nav>
+
+    <div class="main-content">
+      <div class="breadcrumb">
+        <a href="index.html">Карта</a> / <span>Личный кабинет</span>
+      </div>
+
+      <!-- Agent card -->
+      <div class="card">
+        <div class="flex-between">
+          <div>
+            <h2 style="margin-bottom:4px;">Мой ассистент</h2>
+            <p class="text-muted text-small" style="margin:0;">Создан: 15 января 2025</p>
+          </div>
+          <div>
+            <span class="status-dot status-dot--green"></span>
+            <strong>Активен</strong>
+            <span class="badge" style="margin-left:8px;">Базовый</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="flex gap-12 mt-24">
+        <a href="#" class="btn">&#128172; Открыть Telegram</a>
+        <a href="agent-skills.html" class="btn">&#9889; Настроить скиллы</a>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
