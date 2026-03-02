@@ -65,7 +65,7 @@ export function ChannelPage() {
   const channels = data?.channels ?? []
 
   return (
-    <div>
+    <div className="page-wrap">
       <h1>Каналы связи</h1>
 
       {error && <ErrorBanner message={error.message} />}

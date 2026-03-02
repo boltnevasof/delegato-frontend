@@ -87,7 +87,7 @@ export function ToolsPage() {
   }
 
   return (
-    <div>
+    <div className="page-wrap">
       <h1>Инструменты</h1>
 
       {error && <ErrorBanner message={error.message} />}
@@ -115,7 +115,7 @@ export function ToolsPage() {
         </div>
       )}
 
-      <h2 className="mt-16">Доступные инструменты</h2>
+      <h2 className="mt-32">Доступные инструменты</h2>
       <div className="tool-grid">
         {availableTools.map((tool) => (
           <ToolCard

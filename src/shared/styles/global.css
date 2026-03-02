@@ -694,7 +694,14 @@ textarea.form-input {
   color: var(--color-primary);
 }
 
-/* Skill Card */
+/* Skill Grid & Card */
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
 .skill-card {
   background: var(--color-bg-white);
   border: 1px solid var(--color-border);
@@ -702,83 +709,172 @@ textarea.form-input {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  transition: border-color 0.15s, box-shadow 0.15s;
-  position: relative;
+  transition: border-color 0.15s;
 }
 .skill-card:hover {
   border-color: rgba(31, 94, 255, 0.4);
 }
-.skill-card .skill-icon {
-  font-size: 28px;
+.skill-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
 }
-.skill-card .skill-name {
+.skill-card__header h4 {
   font-size: 15px;
-  font-weight: 600;
-  color: var(--color-primary);
-  margin-bottom: 4px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin: 0;
 }
-.skill-card .skill-desc {
-  font-size: 13px;
-  color: var(--color-text-muted);
-  margin-bottom: 12px;
+.skill-card .text-small {
+  margin-bottom: 16px;
   line-height: 1.4;
+  flex: 1;
 }
-.skill-card .skill-actions {
+.skill-card__actions {
   display: flex;
   gap: 8px;
   margin-top: auto;
 }
 .skill-card.added {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 1px var(--color-primary);
-  background: var(--color-bg);
+  border-color: rgba(31, 94, 255, 0.3);
 }
 .skill-card.disabled {
   opacity: 0.55;
 }
-.skill-card .badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
+
+/* Tool Grid & Card */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
 }
 
-/* Tool Card */
 .tool-card {
   background: var(--color-bg-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 20px;
+  display: flex;
+  flex-direction: column;
   transition: border-color 0.15s;
 }
 .tool-card:hover {
   border-color: rgba(31, 94, 255, 0.4);
 }
-.tool-card .tool-header {
+.tool-card__header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-}
-.tool-card .tool-icon {
-  font-size: 28px;
+  align-items: center;
   margin-bottom: 8px;
 }
-.tool-card .tool-name {
+.tool-card__header strong {
   font-size: 15px;
-  font-weight: 600;
-  color: var(--color-primary);
-  margin-bottom: 4px;
+  font-weight: 500;
+  color: var(--color-text);
 }
-.tool-card .tool-desc {
-  font-size: 13px;
-  color: var(--color-text-muted);
-  margin-bottom: 12px;
+.tool-card .text-small {
+  margin-bottom: 16px;
+  line-height: 1.4;
+  flex: 1;
 }
-.tool-card.connected {
-  border-color: var(--color-success);
+.tool-card__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+.tool-card.added {
+  border-color: rgba(31, 94, 255, 0.3);
 }
 .tool-card.disabled {
   opacity: 0.55;
+}
+
+/* Channel List & Card */
+.channel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.channel-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s;
+}
+.channel-card:hover {
+  border-color: rgba(31, 94, 255, 0.4);
+}
+.channel-card.disabled {
+  opacity: 0.5;
+}
+.channel-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.channel-actions {
+  flex-shrink: 0;
+}
+
+/* Dashboard Stats */
+.grid-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.stat-item {
+  text-align: center;
+  padding: 12px;
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+}
+.stat-value {
+  display: block;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+.stat-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+.actions-row {
+  display: flex;
+  gap: 12px;
+}
+.quick-links {
+  margin-top: 24px;
+}
+.link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+.link-item {
+  display: block;
+  padding: 10px 16px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s;
+}
+.link-item:hover {
+  background: #edf2ff;
+  color: var(--color-primary);
+}
+.flex-center {
+  display: flex;
+  align-items: center;
 }
 
 /* Loader */

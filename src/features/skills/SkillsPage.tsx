@@ -91,7 +91,7 @@ export function SkillsPage() {
   }
 
   return (
-    <div>
+    <div className="page-wrap">
       <h1>Задачи и скиллы</h1>
 
       {error && <ErrorBanner message={error.message} />}
@@ -119,7 +119,7 @@ export function SkillsPage() {
         </div>
       )}
 
-      <h2 className="mt-16">Маркетплейс навыков</h2>
+      <h2 className="mt-32">Маркетплейс навыков</h2>
       <div className="skill-grid">
         {availableSkills.map((skill) => (
           <SkillCard

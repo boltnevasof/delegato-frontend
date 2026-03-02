@@ -69,7 +69,7 @@ export function EditorForm({ content, onSave, onEnhance, title }: EditorFormProp
   }
 
   return (
-    <div>
+    <div className="page-wrap">
       <h1>{title}</h1>
 
       {error && <ErrorBanner message={error.message} />}
