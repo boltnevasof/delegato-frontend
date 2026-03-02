@@ -43,9 +43,7 @@ export function DashboardPage() {
   if (agentQuery.isLoading || userQuery.isLoading) {
     return (
       <div className="page-wrap">
-        <div className="flex-center" style={{ padding: '4rem 0' }}>
-          <Spinner />
-        </div>
+        <Spinner />
       </div>
     )
   }

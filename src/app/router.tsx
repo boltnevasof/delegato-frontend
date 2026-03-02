@@ -15,67 +15,62 @@ function GuestRoute() {
   return <Outlet />
 }
 
-// Lazy-loaded feature pages
-const AuthPage = () => import('../features/auth/AuthPage').then(m => ({ default: m.AuthPage }))
-const GoogleCallback = () => import('../features/auth/GoogleCallback').then(m => ({ default: m.GoogleCallback }))
-const PricingPage = () => import('../features/pricing/PricingPage').then(m => ({ default: m.PricingPage }))
-const Step1Describe = () => import('../features/onboarding/Step1Describe').then(m => ({ default: m.Step1Describe }))
-const Step2Channel = () => import('../features/onboarding/Step2Channel').then(m => ({ default: m.Step2Channel }))
-const Step3Skills = () => import('../features/onboarding/Step3Skills').then(m => ({ default: m.Step3Skills }))
-const Step4Tools = () => import('../features/onboarding/Step4Tools').then(m => ({ default: m.Step4Tools }))
-const Step5Complete = () => import('../features/onboarding/Step5Complete').then(m => ({ default: m.Step5Complete }))
-const DashboardPage = () => import('../features/dashboard/DashboardPage').then(m => ({ default: m.DashboardPage }))
-const SoulMdPage = () => import('../features/agent/SoulMdPage').then(m => ({ default: m.SoulMdPage }))
-const AgentMdPage = () => import('../features/agent/AgentMdPage').then(m => ({ default: m.AgentMdPage }))
-const SkillsPage = () => import('../features/skills/SkillsPage').then(m => ({ default: m.SkillsPage }))
-const ToolsPage = () => import('../features/tools/ToolsPage').then(m => ({ default: m.ToolsPage }))
-const ChannelPage = () => import('../features/channels/ChannelPage').then(m => ({ default: m.ChannelPage }))
-const SubscriptionPage = () => import('../features/billing/SubscriptionPage').then(m => ({ default: m.SubscriptionPage }))
-const SupportPage = () => import('../features/support/SupportPage').then(m => ({ default: m.SupportPage }))
+// react-router-dom v7 lazy() must return { Component }
+const lazyAuth = () => import('../features/auth/AuthPage').then(m => ({ Component: m.AuthPage }))
+const lazyGoogleCb = () => import('../features/auth/GoogleCallback').then(m => ({ Component: m.GoogleCallback }))
+const lazyPricing = () => import('../features/pricing/PricingPage').then(m => ({ Component: m.PricingPage }))
+const lazyStep1 = () => import('../features/onboarding/Step1Describe').then(m => ({ Component: m.Step1Describe }))
+const lazyStep2 = () => import('../features/onboarding/Step2Channel').then(m => ({ Component: m.Step2Channel }))
+const lazyStep3 = () => import('../features/onboarding/Step3Skills').then(m => ({ Component: m.Step3Skills }))
+const lazyStep4 = () => import('../features/onboarding/Step4Tools').then(m => ({ Component: m.Step4Tools }))
+const lazyStep5 = () => import('../features/onboarding/Step5Complete').then(m => ({ Component: m.Step5Complete }))
+const lazyDash = () => import('../features/dashboard/DashboardPage').then(m => ({ Component: m.DashboardPage }))
+const lazySoul = () => import('../features/agent/SoulMdPage').then(m => ({ Component: m.SoulMdPage }))
+const lazyAgent = () => import('../features/agent/AgentMdPage').then(m => ({ Component: m.AgentMdPage }))
+const lazySkills = () => import('../features/skills/SkillsPage').then(m => ({ Component: m.SkillsPage }))
+const lazyTools = () => import('../features/tools/ToolsPage').then(m => ({ Component: m.ToolsPage }))
+const lazyChan = () => import('../features/channels/ChannelPage').then(m => ({ Component: m.ChannelPage }))
+const lazySub = () => import('../features/billing/SubscriptionPage').then(m => ({ Component: m.SubscriptionPage }))
+const lazySup = () => import('../features/support/SupportPage').then(m => ({ Component: m.SupportPage }))
+const lazyLanding = () => import('../features/landing/LandingPage').then(m => ({ Component: m.LandingPage }))
 
 export const router = createBrowserRouter([
-  // Guest-only routes (auth pages wrapped in AuthLayout)
   {
     element: <GuestRoute />,
     children: [
       {
         element: <AuthLayout />,
         children: [
-          { path: '/auth', lazy: AuthPage },
+          { path: '/auth', lazy: lazyAuth },
         ],
       },
-      { path: '/auth/callback/google', lazy: GoogleCallback },
+      { path: '/auth/callback/google', lazy: lazyGoogleCb },
     ],
   },
-  // Public route (no auth for viewing, payment requires auth)
-  { path: '/pricing', lazy: PricingPage },
-  // Protected routes
+  { path: '/pricing', lazy: lazyPricing },
   {
     element: <ProtectedRoute />,
     children: [
-      // Onboarding (no sidebar layout)
-      { path: '/onboarding/1', lazy: Step1Describe },
-      { path: '/onboarding/2', lazy: Step2Channel },
-      { path: '/onboarding/3', lazy: Step3Skills },
-      { path: '/onboarding/4', lazy: Step4Tools },
-      { path: '/onboarding/5', lazy: Step5Complete },
-      // Dashboard pages (with sidebar layout)
+      { path: '/onboarding/1', lazy: lazyStep1 },
+      { path: '/onboarding/2', lazy: lazyStep2 },
+      { path: '/onboarding/3', lazy: lazyStep3 },
+      { path: '/onboarding/4', lazy: lazyStep4 },
+      { path: '/onboarding/5', lazy: lazyStep5 },
       {
         element: <DashboardLayout />,
         children: [
-          { path: '/dashboard', lazy: DashboardPage },
-          { path: '/agent/personality', lazy: SoulMdPage },
-          { path: '/agent/rules', lazy: AgentMdPage },
-          { path: '/agent/skills', lazy: SkillsPage },
-          { path: '/agent/tools', lazy: ToolsPage },
-          { path: '/agent/channel', lazy: ChannelPage },
-          { path: '/billing', lazy: SubscriptionPage },
-          { path: '/support', lazy: SupportPage },
+          { path: '/dashboard', lazy: lazyDash },
+          { path: '/agent/personality', lazy: lazySoul },
+          { path: '/agent/rules', lazy: lazyAgent },
+          { path: '/agent/skills', lazy: lazySkills },
+          { path: '/agent/tools', lazy: lazyTools },
+          { path: '/agent/channel', lazy: lazyChan },
+          { path: '/billing', lazy: lazySub },
+          { path: '/support', lazy: lazySup },
         ],
       },
     ],
   },
-  // Default redirect
-  { path: '/', element: <Navigate to="/auth" replace /> },
-  { path: '*', element: <Navigate to="/auth" replace /> },
+  { path: '/', lazy: lazyLanding },
+  { path: '*', element: <Navigate to="/" replace /> },
 ])

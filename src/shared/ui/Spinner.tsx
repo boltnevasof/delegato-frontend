@@ -1,12 +1,32 @@
-type SpinnerProps = {
-  size?: number
-}
-
-export function Spinner({ size = 32 }: SpinnerProps) {
+export function Spinner() {
   return (
-    <div
-      className="spinner"
-      style={{ width: size, height: size }}
-    />
+    <div className="loader-wrap">
+      <div className="boxes">
+        <div className="box">
+          <div />
+          <div />
+          <div />
+          <div />
+        </div>
+        <div className="box">
+          <div />
+          <div />
+          <div />
+          <div />
+        </div>
+        <div className="box">
+          <div />
+          <div />
+          <div />
+          <div />
+        </div>
+        <div className="box">
+          <div />
+          <div />
+          <div />
+          <div />
+        </div>
+      </div>
+    </div>
   )
 }

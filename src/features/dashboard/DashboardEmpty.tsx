@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-import { EmptyState, Button } from '../../shared/ui'
+import { EmptyState, Button, RobotIcon } from '../../shared/ui'
 
 export function DashboardEmpty() {
   return (
     <EmptyState
-      icon="🤖"
+      icon={<RobotIcon />}
       title="У вас пока нет агентов"
       description="Создайте AI-ассистента, который завтра утром пришлёт вам план дня"
       action={

@@ -9,3 +9,4 @@ export { ProgressBar } from './ProgressBar.tsx';
 export { ErrorBanner } from './ErrorBanner.tsx';
 export { Spinner } from './Spinner.tsx';
 export { EmptyState } from './EmptyState.tsx';
+export { RobotIcon } from './RobotIcon.tsx';
