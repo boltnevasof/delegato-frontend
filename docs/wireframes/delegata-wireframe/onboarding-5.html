@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — Шаг 5: Готово</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="breadcrumb">
+      <a href="index.html">Карта</a> / <span>Онбординг — Шаг 5</span>
+    </div>
+
+    <div class="onboarding-wrap" style="text-align:center;">
+      <!-- Progress -->
+      <div class="progress" style="justify-content:center;">
+        <div class="progress-step active"></div>
+        <div class="progress-line active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-line active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-line active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-line active"></div>
+        <div class="progress-step active"></div>
+        <span class="progress-label">Готово!</span>
+      </div>
+
+      <!-- State A: Ready -->
+      <div id="state-ready">
+        <div style="font-size:64px;margin:24px 0;">&#9989;</div>
+        <h1>Ваш ассистент готов!</h1>
+        <p style="font-size:16px;color:#555;margin:16px 0;">Завтра утром вы получите первый брифинг в Telegram.</p>
+        <p style="color:#888;">Напишите агенту прямо сейчас — он уже вас знает.</p>
+        <div style="margin-top:32px;display:flex;flex-direction:column;gap:12px;align-items:center;">
+          <a href="#" class="btn btn--large">&#128172; Открыть Telegram</a>
+          <a href="dashboard-active.html" class="btn btn--primary btn--large">Перейти в личный кабинет</a>
+        </div>
+      </div>
+
+      <!-- State B: Building -->
+      <div id="state-building" class="hidden">
+        <div style="margin:24px 0;">
+          <div class="spinner" style="width:48px;height:48px;"></div>
+        </div>
+        <h1>Собираем вашего агента</h1>
+        <p style="font-size:16px;color:#555;margin:16px 0;">Обычно это занимает 3-5 минут.</p>
+        <p style="color:#888;">Мы пришлём уведомление в Telegram, когда всё будет готово.</p>
+        <div style="margin-top:32px;">
+          <a href="dashboard-active.html" class="btn btn--primary btn--large">Перейти в личный кабинет</a>
+        </div>
+      </div>
+
+      <!-- State C: Error -->
+      <div id="state-error" class="hidden">
+        <div style="font-size:64px;margin:24px 0;">&#10060;</div>
+        <h1>Не удалось создать агента</h1>
+        <p style="font-size:16px;color:#555;margin:16px 0;">Произошла ошибка при настройке. Наша команда уже уведомлена.</p>
+        <p style="color:#888;">Попробуйте ещё раз или напишите в поддержку — мы поможем.</p>
+        <div style="margin-top:32px;display:flex;flex-direction:column;gap:12px;align-items:center;">
+          <button class="btn btn--primary btn--large" onclick="retryBuild()">Попробовать снова</button>
+          <a href="support.html" class="btn btn--large">Написать в поддержку</a>
+        </div>
+      </div>
+
+      <!-- Toggle buttons for demo -->
+      <div style="margin-top:60px;padding-top:24px;border-top:1px solid #eee;">
+        <p class="text-muted text-small mb-8">Переключить состояние (для демо):</p>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button class="btn btn--small" onclick="showState('ready')">Готов</button>
+          <button class="btn btn--small" onclick="showState('building')">Собирается</button>
+          <button class="btn btn--small" onclick="showState('error')">Ошибка</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showState(state) {
+      document.getElementById('state-ready').classList.toggle('hidden', state !== 'ready');
+      document.getElementById('state-building').classList.toggle('hidden', state !== 'building');
+      document.getElementById('state-error').classList.toggle('hidden', state !== 'error');
+    }
+
+    function retryBuild() {
+      showState('building');
+      setTimeout(function() {
+        showState('ready');
+      }, 2000);
+    }
+  </script>
+</body>
+</html>

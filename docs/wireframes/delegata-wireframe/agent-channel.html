@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — Канал связи</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <a href="index.html" class="header-logo">Delegata</a>
+    <div class="header-right">
+      <a href="subscription.html">Подписка</a>
+      <span>&#128100; Пользователь</span>
+    </div>
+  </div>
+
+  <div class="layout-sidebar">
+    <nav class="sidebar">
+      <a href="dashboard-active.html">&#128202; Дашборд</a>
+      <a href="agent-soul.html">&#128100; Личность (SOUL.md)</a>
+      <a href="agent-rules.html">&#128220; Правила (AGENT.md)</a>
+      <a href="agent-skills.html">&#9889; Задачи и скиллы</a>
+      <a href="agent-tools.html">&#128295; Инструменты</a>
+      <a href="agent-channel.html" class="active">&#128172; Канал связи</a>
+      <a href="subscription.html">&#128179; Подписка</a>
+      <a href="support.html">&#128488; Поддержка</a>
+    </nav>
+
+    <div class="main-content">
+      <div class="breadcrumb">
+        <a href="index.html">Карта</a> / <a href="dashboard-active.html">ЛК</a> / <span>Канал связи</span>
+      </div>
+
+      <h1>Канал связи</h1>
+
+      <!-- Connected channel -->
+      <div class="card mt-24">
+        <div class="flex-between">
+          <div>
+            <h3>&#128172; Telegram</h3>
+            <p style="margin:4px 0 0;"><span class="status-dot status-dot--green"></span> <strong>Подключён</strong></p>
+            <p class="text-muted text-small" style="margin:4px 0 0;">@DelegataBot &bull; подключён 15 янв 2025</p>
+          </div>
+          <div class="flex gap-12">
+            <button class="btn btn--small" onclick="reconnectTg()">Переподключить</button>
+            <button class="btn btn--small btn--danger" onclick="disconnectTg()">Отключить</button>
+          </div>
+        </div>
+
+        <!-- Reconnect instructions -->
+        <div id="tg-reconnect" class="hidden mt-16" style="padding:16px;background:#f9f9f9;border-radius:6px;">
+          <p style="font-weight:600;margin-bottom:12px;">Переподключение Telegram:</p>
+          <ol style="font-size:14px;color:#555;padding-left:18px;">
+            <li>Откройте Telegram</li>
+            <li>Найдите бота @DelegataBot</li>
+            <li>Нажмите /start</li>
+            <li>Отправьте новый код: <strong>DLG-8M31P</strong></li>
+          </ol>
+          <button class="btn btn--primary btn--small mt-16" onclick="finishReconnect()">Готово</button>
+          <button class="btn btn--small mt-16" onclick="document.getElementById('tg-reconnect').classList.add('hidden')">Отмена</button>
+        </div>
+
+        <!-- Reconnect error -->
+        <div id="tg-reconnect-error" class="hidden mt-16">
+          <div class="error-banner show">
+            <strong>Не удалось переподключить Telegram</strong>
+            Убедитесь, что вы отправили код боту и попробуйте снова.
+            <div class="error-actions">
+              <button class="btn btn--small" onclick="document.getElementById('tg-reconnect-error').classList.add('hidden'); reconnectTg();">Попробовать снова</button>
+              <a href="support.html" class="btn btn--small">Написать в поддержку</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disconnect confirm -->
+        <div id="tg-disconnect" class="hidden mt-16" style="padding:16px;background:#fff8f0;border:1px solid #f0d0a0;border-radius:6px;">
+          <p style="margin-bottom:12px;">Вы уверены? Агент перестанет получать и отправлять сообщения в Telegram.</p>
+          <button class="btn btn--small btn--danger" onclick="doDisconnect()">Да, отключить</button>
+          <button class="btn btn--small" onclick="document.getElementById('tg-disconnect').classList.add('hidden')">Отмена</button>
+        </div>
+      </div>
+
+      <!-- Other channels -->
+      <h3 class="mt-32">Другие каналы</h3>
+
+      <div class="card card--disabled mt-16">
+        <div class="flex-between">
+          <div>
+            <h3>WhatsApp <span class="badge badge--soon">Скоро</span></h3>
+            <p class="text-muted text-small" style="margin:0;">Появится в ближайших обновлениях</p>
+          </div>
+          <button class="btn btn--small" disabled>Подключить</button>
+        </div>
+      </div>
+
+      <div class="card card--disabled mt-16">
+        <div class="flex-between">
+          <div>
+            <h3>Email <span class="badge badge--soon">Скоро</span></h3>
+            <p class="text-muted text-small" style="margin:0;">Появится в ближайших обновлениях</p>
+          </div>
+          <button class="btn btn--small" disabled>Подключить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function reconnectTg() {
+      document.getElementById('tg-reconnect').classList.remove('hidden');
+      document.getElementById('tg-disconnect').classList.add('hidden');
+    }
+
+    function disconnectTg() {
+      document.getElementById('tg-disconnect').classList.remove('hidden');
+      document.getElementById('tg-reconnect').classList.add('hidden');
+    }
+
+    function finishReconnect() {
+      document.getElementById('tg-reconnect').classList.add('hidden');
+      alert('Telegram успешно переподключён!');
+    }
+
+    function doDisconnect() {
+      document.getElementById('tg-disconnect').classList.add('hidden');
+      document.querySelector('.status-dot').classList.remove('status-dot--green');
+      document.querySelector('.status-dot').classList.add('status-dot--red');
+      document.querySelector('.status-dot').nextElementSibling.textContent = 'Отключён';
+    }
+
+    function showReconnectError() {
+      document.getElementById('tg-reconnect').classList.add('hidden');
+      document.getElementById('tg-disconnect').classList.add('hidden');
+      document.getElementById('tg-reconnect-error').classList.remove('hidden');
+    }
+  </script>
+
+  <!-- Demo toggle -->
+  <div style="position:fixed;bottom:16px;right:16px;background:#fff;border:1px solid #ddd;border-radius:6px;padding:10px 14px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+    <span style="color:#999;">Демо:</span>
+    <button class="btn btn--small" onclick="showReconnectError()" style="font-size:11px;">Ошибка переподключения</button>
+  </div>
+</body>
+</html>

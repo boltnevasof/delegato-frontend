@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — Подписка</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <a href="index.html" class="header-logo">Delegata</a>
+    <div class="header-right">
+      <a href="subscription.html">Подписка</a>
+      <span>&#128100; Пользователь</span>
+    </div>
+  </div>
+
+  <div class="layout-sidebar">
+    <nav class="sidebar">
+      <a href="dashboard-active.html">&#128202; Дашборд</a>
+      <a href="agent-soul.html">&#128100; Личность (SOUL.md)</a>
+      <a href="agent-rules.html">&#128220; Правила (AGENT.md)</a>
+      <a href="agent-skills.html">&#9889; Задачи и скиллы</a>
+      <a href="agent-tools.html">&#128295; Инструменты</a>
+      <a href="agent-channel.html">&#128172; Канал связи</a>
+      <a href="subscription.html" class="active">&#128179; Подписка</a>
+      <a href="support.html">&#128488; Поддержка</a>
+    </nav>
+
+    <div class="main-content">
+      <div class="breadcrumb">
+        <a href="index.html">Карта</a> / <a href="dashboard-active.html">ЛК</a> / <span>Подписка</span>
+      </div>
+
+      <h1>Подписка</h1>
+
+      <!-- Current plan -->
+      <div class="card mt-24">
+        <h3>Текущий тариф</h3>
+        <div style="display:flex;gap:16px;margin-top:12px;">
+          <div class="card card--selected" style="flex:1;margin-bottom:0;" id="current-plan-basic">
+            <h3>Базовый</h3>
+            <div style="font-size:20px;font-weight:700;">4 490 &#8381;/мес</div>
+          </div>
+          <div class="card" style="flex:1;margin-bottom:0;opacity:0.6;" id="current-plan-assistant">
+            <h3>Ассистент</h3>
+            <div style="font-size:20px;font-weight:700;">9 990 &#8381;/мес</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Billing info -->
+      <div class="card mt-16">
+        <h3>Платёжная информация</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px;">
+          <div>
+            <p class="text-muted text-small" style="margin-bottom:4px;">Следующее списание</p>
+            <p style="font-weight:600;margin:0;">15 февраля 2025 &bull; 4 490 &#8381;</p>
+          </div>
+          <div>
+            <p class="text-muted text-small" style="margin-bottom:4px;">Способ оплаты</p>
+            <p style="font-weight:600;margin:0;">&bull;&bull;&bull;&bull; 4242 <button class="btn btn--small" style="margin-left:8px;" onclick="alert('Форма смены карты')">Сменить карту</button></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change plan -->
+      <div class="card mt-16">
+        <h3>Сменить тариф</h3>
+        <p class="text-muted text-small">Изменение тарифа вступит в силу со следующего периода.</p>
+        <div class="mt-16">
+          <button class="btn btn--primary" id="upgrade-btn" onclick="togglePlan()">Перейти на Ассистент (9 990 &#8381;/мес)</button>
+        </div>
+      </div>
+
+      <!-- Cancel -->
+      <div class="mt-32" style="text-align:right;">
+        <button class="btn btn--danger btn--small" onclick="showCancelModal()">Отменить подписку</button>
+      </div>
+
+      <!-- Cancel modal -->
+      <div class="modal-overlay" id="cancel-modal">
+        <div class="modal">
+          <h3>Почему уходите?</h3>
+          <p class="text-muted text-small mb-16">Нам важно знать, чтобы стать лучше.</p>
+
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <label class="radio-card">
+              <input type="radio" name="cancel-reason" value="expensive">
+              <span>Слишком дорого</span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="cancel-reason" value="not-useful">
+              <span>Не вижу пользы</span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="cancel-reason" value="alternative">
+              <span>Нашёл альтернативу</span>
+            </label>
+            <label class="radio-card">
+              <input type="radio" name="cancel-reason" value="other">
+              <span>Другое</span>
+            </label>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn" onclick="hideCancelModal()">Остаться</button>
+            <button class="btn btn--danger" onclick="confirmCancel()">Отменить подписку</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cancelled state -->
+      <div id="cancelled-msg" class="hidden mt-16" style="padding:16px;background:#fff0f0;border:1px solid #fcc;border-radius:6px;text-align:center;">
+        <p style="color:#c00;font-weight:600;margin:0;">Подписка отменена. Агент будет активен до 15 февраля 2025.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPlan = 'basic';
+
+    function togglePlan() {
+      const btn = document.getElementById('upgrade-btn');
+      const basicCard = document.getElementById('current-plan-basic');
+      const assistantCard = document.getElementById('current-plan-assistant');
+
+      if (currentPlan === 'basic') {
+        currentPlan = 'assistant';
+        btn.textContent = 'Перейти на Базовый (4 490 \u20BD/мес)';
+        basicCard.classList.remove('card--selected');
+        basicCard.style.opacity = '0.6';
+        assistantCard.classList.add('card--selected');
+        assistantCard.style.opacity = '1';
+      } else {
+        currentPlan = 'basic';
+        btn.textContent = 'Перейти на Ассистент (9 990 \u20BD/мес)';
+        assistantCard.classList.remove('card--selected');
+        assistantCard.style.opacity = '0.6';
+        basicCard.classList.add('card--selected');
+        basicCard.style.opacity = '1';
+      }
+    }
+
+    function showCancelModal() {
+      document.getElementById('cancel-modal').classList.add('show');
+    }
+
+    function hideCancelModal() {
+      document.getElementById('cancel-modal').classList.remove('show');
+    }
+
+    function confirmCancel() {
+      hideCancelModal();
+      document.getElementById('cancelled-msg').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

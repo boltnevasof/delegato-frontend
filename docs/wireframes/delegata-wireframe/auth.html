@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — Вход</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="breadcrumb">
+      <a href="index.html">Карта</a> / <a href="landing.html">Лендинг</a> / <span>Вход</span>
+    </div>
+
+    <div class="auth-container">
+      <h1>Войти в Delegata</h1>
+      <p class="subtitle">Создайте AI-ассистента за 5 минут</p>
+
+      <!-- Step 1: Auth methods -->
+      <div id="auth-methods">
+        <div class="auth-buttons">
+          <button class="btn btn--large" onclick="simulateLogin()" style="width:100%;">&#128172; Войти через Telegram</button>
+          <button class="btn btn--large" onclick="simulateLogin()" style="width:100%;">&#127758; Войти через Google</button>
+        </div>
+
+        <div class="auth-divider">или</div>
+
+        <div id="email-form">
+          <div class="form-group" style="text-align:left;">
+            <label>Email</label>
+            <input type="email" class="form-input" placeholder="your@email.com" id="email-input">
+          </div>
+          <button class="btn btn--primary" style="width:100%;" onclick="showCodeStep()">Отправить код</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Enter code -->
+      <div id="code-step" class="hidden">
+        <p style="margin-bottom:20px;">Код отправлен на <strong id="sent-email"></strong></p>
+        <div class="form-group" style="text-align:left;">
+          <label>Введите код</label>
+          <input type="text" class="form-input" placeholder="123456" maxlength="6" id="code-input">
+        </div>
+        <button class="btn btn--primary" style="width:100%;" onclick="simulateLogin()">Войти</button>
+        <p class="text-muted mt-16"><a href="#" onclick="backToAuth();return false;">Другой способ входа</a></p>
+      </div>
+
+      <!-- Step 3: Success -->
+      <div id="auth-success" class="hidden">
+        <div style="font-size:48px;margin-bottom:16px;">&#9989;</div>
+        <h2>Вы вошли!</h2>
+        <p class="text-muted">Перенаправляем...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get('plan');
+
+    function showCodeStep() {
+      const email = document.getElementById('email-input').value || 'user@example.com';
+      document.getElementById('sent-email').textContent = email;
+      document.getElementById('auth-methods').classList.add('hidden');
+      document.getElementById('code-step').classList.remove('hidden');
+    }
+
+    function backToAuth() {
+      document.getElementById('auth-methods').classList.remove('hidden');
+      document.getElementById('code-step').classList.add('hidden');
+    }
+
+    function simulateLogin() {
+      document.getElementById('auth-methods').classList.add('hidden');
+      document.getElementById('code-step').classList.add('hidden');
+      document.getElementById('auth-success').classList.remove('hidden');
+
+      setTimeout(function() {
+        if (plan) {
+          window.location.href = 'pricing.html?plan=' + plan;
+        } else {
+          window.location.href = 'dashboard-empty.html';
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — Выбор тарифа</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrap">
+    <div class="breadcrumb">
+      <a href="index.html">Карта</a> / <span>Выбор тарифа</span>
+    </div>
+
+    <h1 class="text-center">Выберите тариф</h1>
+    <p class="text-center text-muted mb-32">Подписка продлевается автоматически. Отменить можно в любой момент.</p>
+
+    <div class="grid grid--2" style="max-width:800px;margin:0 auto;">
+      <!-- Basic -->
+      <div class="radio-card" id="plan-basic" onclick="selectPlan('basic')">
+        <input type="radio" name="plan" value="basic" id="radio-basic">
+        <div>
+          <h3>Базовый</h3>
+          <div style="font-size:24px;font-weight:700;">4 490 &#8381;<span style="font-size:14px;font-weight:400;color:#888;">/мес</span></div>
+          <ul style="list-style:none;margin-top:12px;font-size:14px;color:#555;">
+            <li>&#10003; Бесплатная LLM</li>
+            <li>&#10003; 1 канал связи</li>
+            <li>&#10003; Утренний брифинг</li>
+            <li>&#10003; Напоминания</li>
+            <li>&#10003; Поиск информации</li>
+            <li>&#10003; Сортировка входящих</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Assistant -->
+      <div class="radio-card" id="plan-assistant" onclick="selectPlan('assistant')">
+        <input type="radio" name="plan" value="assistant" id="radio-assistant">
+        <div>
+          <div class="flex-between">
+            <h3>Ассистент</h3>
+            <span class="badge badge--popular">Популярный</span>
+          </div>
+          <div style="font-size:24px;font-weight:700;">9 990 &#8381;<span style="font-size:14px;font-weight:400;color:#888;">/мес</span></div>
+          <ul style="list-style:none;margin-top:12px;font-size:14px;color:#555;">
+            <li>&#10003; ChatGPT Plus</li>
+            <li>&#10003; 3 канала связи</li>
+            <li>&#10003; Все скиллы Базового</li>
+            <li>&#10003; Ответы клиентам</li>
+            <li>&#10003; Клиентская коммуникация</li>
+            <li>&#10003; Приоритетная поддержка</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment -->
+    <div style="max-width:500px;margin:40px auto 0;">
+      <h2>Оплата</h2>
+
+      <div class="form-group">
+        <label>Номер карты</label>
+        <input type="text" class="form-input" placeholder="0000 0000 0000 0000" maxlength="19">
+      </div>
+      <div class="grid grid--2">
+        <div class="form-group">
+          <label>Срок</label>
+          <input type="text" class="form-input" placeholder="MM/YY" maxlength="5">
+        </div>
+        <div class="form-group">
+          <label>CVV</label>
+          <input type="text" class="form-input" placeholder="000" maxlength="3">
+        </div>
+      </div>
+
+      <div class="flex-between mb-16" style="padding:16px 0;border-top:1px solid #eee;">
+        <span style="font-size:16px;font-weight:600;">Итого:</span>
+        <span style="font-size:20px;font-weight:700;" id="total-price">4 490 &#8381;</span>
+      </div>
+
+      <!-- Payment error -->
+      <div class="error-banner mb-16" id="payment-error">
+        <strong>Оплата не прошла</strong>
+        Проверьте данные карты или используйте другую.
+      </div>
+
+      <a href="onboarding-1.html" class="btn btn--primary btn--large" style="width:100%;text-align:center;" id="pay-btn">Оплатить 4 490 &#8381;</a>
+
+      <p class="text-muted text-center mt-16">Подписка продлевается автоматически. Отменить можно в любой момент.</p>
+
+      <!-- Demo toggle for error state -->
+      <div style="margin-top:40px;padding-top:16px;border-top:1px solid #eee;">
+        <p class="text-muted text-small mb-8">Демо: показать ошибку оплаты</p>
+        <button class="btn btn--small" onclick="togglePaymentError()">Показать / скрыть ошибку</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const preselected = params.get('plan');
+
+    const prices = { basic: '4 490', assistant: '9 990' };
+
+    function selectPlan(plan) {
+      document.querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('plan-' + plan).classList.add('selected');
+      document.getElementById('radio-' + plan).checked = true;
+      document.getElementById('total-price').innerHTML = prices[plan] + ' &#8381;';
+      document.getElementById('pay-btn').innerHTML = 'Оплатить ' + prices[plan] + ' &#8381;';
+    }
+
+    if (preselected && prices[preselected]) {
+      selectPlan(preselected);
+    } else {
+      selectPlan('basic');
+    }
+
+    function togglePaymentError() {
+      document.getElementById('payment-error').classList.toggle('show');
+    }
+  </script>
+</body>
+</html>

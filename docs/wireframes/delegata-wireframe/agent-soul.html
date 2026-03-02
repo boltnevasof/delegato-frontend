@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Delegata — SOUL.md</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="header">
+    <a href="index.html" class="header-logo">Delegata</a>
+    <div class="header-right">
+      <a href="subscription.html">Подписка</a>
+      <span>&#128100; Пользователь</span>
+    </div>
+  </div>
+
+  <div class="layout-sidebar">
+    <nav class="sidebar">
+      <a href="dashboard-active.html">&#128202; Дашборд</a>
+      <a href="agent-soul.html" class="active">&#128100; Личность (SOUL.md)</a>
+      <a href="agent-rules.html">&#128220; Правила (AGENT.md)</a>
+      <a href="agent-skills.html">&#9889; Задачи и скиллы</a>
+      <a href="agent-tools.html">&#128295; Инструменты</a>
+      <a href="agent-channel.html">&#128172; Канал связи</a>
+      <a href="subscription.html">&#128179; Подписка</a>
+      <a href="support.html">&#128488; Поддержка</a>
+    </nav>
+
+    <div class="main-content">
+      <div class="breadcrumb">
+        <a href="index.html">Карта</a> / <a href="dashboard-active.html">ЛК</a> / <span>SOUL.md</span>
+      </div>
+
+      <h1>Личность агента (SOUL.md)</h1>
+      <p>Здесь описано кто вы, чем занимаетесь и как агент должен общаться. Пишите в свободной форме.</p>
+
+      <div class="form-group mt-24">
+        <textarea class="form-input" rows="16" id="soul-text">Меня зовут Ирина, я владелица салона красоты "Bloom" в Москве.
+
+У меня 3 мастера и примерно 50-60 клиентов в месяц.
+
+Клиенты пишут мне в Telegram и Instagram. Часто спрашивают про свободные окна, цены и акции.
+
+Стиль общения: на ты, дружелюбно, с эмодзи. Не люблю формальности.
+
+Важно: всегда предлагать записаться, если клиент просто спрашивает. Не давать скидки без моего одобрения.</textarea>
+      </div>
+
+      <div class="flex gap-12">
+        <button class="btn btn--primary" onclick="saveSoul()">Сохранить</button>
+        <button class="btn btn--secondary" onclick="alert('AI улучшает текст...')">Улучшить с AI</button>
+        <a href="dashboard-active.html" class="btn">Отмена</a>
+      </div>
+
+      <div id="save-msg" class="hidden mt-16" style="color:#2a7a2a;font-weight:500;">&#10003; Сохранено</div>
+      <div id="save-error" class="hidden mt-16">
+        <div class="error-banner show">
+          <strong>Не удалось сохранить</strong>
+          Попробуйте ещё раз. Если проблема повторяется — <a href="support.html">напишите в поддержку</a>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function saveSoul() {
+      document.getElementById('save-error').classList.add('hidden');
+      document.getElementById('save-msg').classList.remove('hidden');
+      setTimeout(() => document.getElementById('save-msg').classList.add('hidden'), 2000);
+    }
+
+    function simulateSaveError() {
+      document.getElementById('save-msg').classList.add('hidden');
+      document.getElementById('save-error').classList.remove('hidden');
+    }
+  </script>
+
+  <!-- Demo toggle -->
+  <div style="position:fixed;bottom:16px;right:16px;background:#fff;border:1px solid #ddd;border-radius:6px;padding:10px 14px;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+    <span style="color:#999;">Демо:</span>
+    <button class="btn btn--small" onclick="simulateSaveError()" style="font-size:11px;">Ошибка сохранения</button>
+  </div>
+</body>
+</html>
