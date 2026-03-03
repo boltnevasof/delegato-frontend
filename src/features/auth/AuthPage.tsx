@@ -64,7 +64,7 @@ export function AuthPage() {
 
   return (
     <>
-      <h1>Войти в Delegata</h1>
+      <h1>Войти в Delegato</h1>
       <p className="subtitle">Создайте AI-ассистента за 5 минут</p>
 
       {error && <ErrorBanner message={error.message} onRetry={clearError} />}
@@ -92,7 +92,7 @@ export function AuthPage() {
                 {...emailForm.register('email', { required: true })}
               />
             </div>
-            <Button variant="primary" type="submit" loading={loading} style={{ width: '100%' }}>
+            <Button variant="primary" type="submit" loading={loading} loadingText="Отправляем код..." style={{ width: '100%' }}>
               Отправить код
             </Button>
           </form>
@@ -115,7 +115,7 @@ export function AuthPage() {
                 {...codeForm.register('code', { required: true, minLength: 6 })}
               />
             </div>
-            <Button variant="primary" type="submit" loading={loading} style={{ width: '100%' }}>
+            <Button variant="primary" type="submit" loading={loading} loadingText="Проверяем код..." style={{ width: '100%' }}>
               Войти
             </Button>
           </form>

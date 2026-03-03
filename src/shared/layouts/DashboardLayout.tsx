@@ -33,7 +33,7 @@ const navItems = [
   },
   {
     to: '/agent/personality',
-    label: 'Личность (SOUL.md)',
+    label: 'Личность',
     icon: (
       <Icon>
         <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" />
@@ -43,7 +43,7 @@ const navItems = [
   },
   {
     to: '/agent/rules',
-    label: 'Правила (AGENT.md)',
+    label: 'Правила',
     icon: (
       <Icon>
         <path d="M9 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4" />

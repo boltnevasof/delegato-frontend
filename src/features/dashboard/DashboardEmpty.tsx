@@ -4,7 +4,7 @@ import { EmptyState, Button, RobotIcon } from '../../shared/ui'
 export function DashboardEmpty() {
   return (
     <EmptyState
-      icon={<RobotIcon />}
+      icon={<RobotIcon size={96} />}
       title="У вас пока нет агентов"
       description="Создайте AI-ассистента, который завтра утром пришлёт вам план дня"
       action={

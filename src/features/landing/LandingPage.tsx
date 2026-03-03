@@ -134,8 +134,10 @@ export function LandingPage() {
             </a>
             {isAuthenticated ? (
               <Link to="/dashboard" className="l-avatar" title="Личный кабинет">
-                <div className="l-avatar-head" />
-                <div className="l-avatar-body" />
+                <span className="l-avatar-icon" aria-hidden="true">
+                  <span className="l-avatar-head" />
+                  <span className="l-avatar-body" />
+                </span>
               </Link>
             ) : (
               <button className="l-btn l-btn-sm" onClick={handleCta}>

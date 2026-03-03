@@ -6,10 +6,11 @@ type ModalProps = {
   title: string
   footer?: ReactNode
   wide?: boolean
+  className?: string
   children: ReactNode
 }
 
-export function Modal({ open, onClose, title, footer, wide, children }: ModalProps) {
+export function Modal({ open, onClose, title, footer, wide, className = '', children }: ModalProps) {
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => {
@@ -24,12 +25,12 @@ export function Modal({ open, onClose, title, footer, wide, children }: ModalPro
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className={`modal ${wide ? 'modal--wide' : ''}`}
+        className={`modal ${wide ? 'modal--wide' : ''} ${className}`.trim()}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex-between mb-16">
-          <h3>{title}</h3>
-          <button className="btn btn--link" onClick={onClose}>&times;</button>
+        <div className="mb-16">
+          <h3 className="modal-title">{title}</h3>
+          <button className="btn btn--link modal-close-btn" onClick={onClose}>&times;</button>
         </div>
         {children}
         {footer && <div className="modal-actions">{footer}</div>}

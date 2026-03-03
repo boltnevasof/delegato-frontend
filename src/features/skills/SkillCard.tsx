@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from 'react'
 import type { components } from '../../api/generated/schema'
 import { Button, Badge, Toggle } from '../../shared/ui'
 
@@ -14,6 +15,12 @@ type SkillCardProps = {
   onDetail?: () => void
 }
 
+function getInitials(name: string): string {
+  const words = name.trim().split(/\s+/)
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+  return `${words[0][0] ?? ''}${words[1][0] ?? ''}`.toUpperCase()
+}
+
 export function SkillCard({
   skill,
   isInstalled,
@@ -25,52 +32,74 @@ export function SkillCard({
   onDetail,
 }: SkillCardProps) {
   const classes = [
-    'skill-card',
-    isInstalled && 'added',
+    'marketplace-plugin-card',
+    isInstalled && 'installed',
     !skill.available_for_user && 'disabled',
   ]
     .filter(Boolean)
     .join(' ')
 
+  function openDetailByKeyboard(e: KeyboardEvent<HTMLDivElement>) {
+    if ((e.key === 'Enter' || e.key === ' ') && onDetail) {
+      e.preventDefault()
+      onDetail()
+    }
+  }
+
   return (
-    <div className={classes}>
-      <div className="skill-card__header">
-        <h4>{skill.name}</h4>
-        {!skill.available_for_user && (
-          <Badge variant="plan">{skill.access_level}</Badge>
-        )}
-        {isInstalled && agentSkillId && onToggle && (
-          <Toggle
-            checked={!!isEnabled}
-            onChange={(checked) => onToggle(agentSkillId, checked)}
-          />
-        )}
+    <div
+      className={classes}
+      onClick={onDetail}
+      onKeyDown={openDetailByKeyboard}
+      role="button"
+      tabIndex={0}
+      aria-label={`Открыть детали навыка ${skill.name}`}
+    >
+      <div className="marketplace-plugin-logo" aria-hidden="true">
+        <span>{getInitials(skill.name)}</span>
       </div>
 
-      <p className="text-small text-muted">{skill.description}</p>
+      <div className="marketplace-plugin-main">
+        <div className="marketplace-plugin-head">
+          <h3>{skill.name}</h3>
+          <div className="marketplace-plugin-right">
+            <Badge variant="plan">{skill.access_level}</Badge>
+            {isInstalled && agentSkillId && onToggle && (
+              <div onClick={(e) => e.stopPropagation()}>
+                <Toggle
+                  checked={!!isEnabled}
+                  onChange={(checked) => onToggle(agentSkillId, checked)}
+                />
+              </div>
+            )}
+          </div>
+        </div>
 
-      <div className="skill-card__actions">
-        <Button variant="ghost" size="small" onClick={onDetail}>
-          Подробнее
-        </Button>
-        {isInstalled && agentSkillId ? (
-          <Button
-            variant="danger"
-            size="small"
-            onClick={() => onDisconnect?.(agentSkillId)}
-          >
-            Отключить
+        <p>{skill.description}</p>
+
+        <div className="marketplace-plugin-actions" onClick={(e) => e.stopPropagation()}>
+          {isInstalled && agentSkillId ? (
+            <Button
+              variant="danger"
+              size="small"
+              onClick={() => onDisconnect?.(agentSkillId)}
+            >
+              Отключить
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="small"
+              disabled={!skill.available_for_user}
+              onClick={() => onConnect?.(skill.id)}
+            >
+              Подключить
+            </Button>
+          )}
+          <Button variant="secondary" size="small" onClick={onDetail}>
+            Подробнее
           </Button>
-        ) : (
-          <Button
-            variant="primary"
-            size="small"
-            disabled={!skill.available_for_user}
-            onClick={() => onConnect?.(skill.id)}
-          >
-            Подключить
-          </Button>
-        )}
+        </div>
       </div>
     </div>
   )

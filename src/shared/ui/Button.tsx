@@ -4,6 +4,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
   size?: 'small' | 'medium' | 'large'
   loading?: boolean
+  loadingText?: string
   children: ReactNode
 }
 
@@ -11,6 +12,7 @@ export function Button({
   variant = 'primary',
   size = 'medium',
   loading = false,
+  loadingText = 'Загрузка...',
   disabled,
   className = '',
   children,
@@ -25,7 +27,12 @@ export function Button({
       disabled={disabled || loading}
       {...props}
     >
-      {loading ? <span className="spinner" style={{ width: 16, height: 16, borderWidth: 2 }} /> : children}
+      {loading ? (
+        <span className="btn-loading-content">
+          <span className="spinner" aria-hidden="true" />
+          <span>{loadingText}</span>
+        </span>
+      ) : children}
     </button>
   )
 }

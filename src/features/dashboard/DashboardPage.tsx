@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { Link } from 'react-router-dom'
 import { getAgent } from '../../api/agents'
 import { getMe } from '../../api/users'
-import { Card, Badge, Button, ErrorBanner, Spinner } from '../../shared/ui'
+import { Card, Badge, ErrorBanner } from '../../shared/ui'
 import { DashboardEmpty } from './DashboardEmpty'
+import { DashboardLoading } from './DashboardLoading'
 
 const STATUS_LABELS: Record<string, string> = {
   active: 'Активен',
@@ -29,7 +29,6 @@ export function DashboardPage() {
     queryKey: ['agent'],
     queryFn: getAgent,
     retry: (failureCount, error) => {
-      // Don't retry on 404
       if ((error as { status?: number }).status === 404) return false
       return failureCount < 3
     },
@@ -43,7 +42,7 @@ export function DashboardPage() {
   if (agentQuery.isLoading || userQuery.isLoading) {
     return (
       <div className="page-wrap">
-        <Spinner />
+        <DashboardLoading />
       </div>
     )
   }
@@ -92,9 +91,6 @@ export function DashboardPage() {
   const statusLabel = STATUS_LABELS[agent.status] || agent.status
   const isActive = agent.status === 'active'
 
-  // Find telegram channel for link
-  const telegramChannel = agent.channels.find((ch) => ch.type === 'telegram')
-
   return (
     <div className="page-wrap">
       <h1>Панель управления</h1>
@@ -102,14 +98,10 @@ export function DashboardPage() {
       <Card className="mt-16">
         <div className="flex-between mb-16">
           <div className="flex-center" style={{ gap: '0.5rem' }}>
-            <span
-              className={`status-dot ${isActive ? 'status-dot--green' : 'status-dot--gray'}`}
-            />
+            <span className={`status-dot ${isActive ? 'status-dot--green' : 'status-dot--gray'}`} />
             <strong>{statusLabel}</strong>
           </div>
-          {subscription && (
-            <Badge variant="plan">{formatTariff(subscription.tariff_slug)}</Badge>
-          )}
+          {subscription && <Badge variant="plan">{formatTariff(subscription.tariff_slug)}</Badge>}
         </div>
 
         <div className="grid-stats mb-16">
@@ -127,39 +119,6 @@ export function DashboardPage() {
           </div>
         </div>
       </Card>
-
-      <div className="actions-row mt-16">
-        {telegramChannel && (
-          <a
-            href={`https://t.me/`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Button variant="secondary">Открыть Telegram</Button>
-          </a>
-        )}
-        <Link to="/agent/skills">
-          <Button variant="secondary">Настроить скиллы</Button>
-        </Link>
-      </div>
-
-      <div className="quick-links mt-16">
-        <h3>Настройки агента</h3>
-        <div className="link-list">
-          <Link to="/agent/personality" className="link-item">
-            Личность агента (SOUL.md)
-          </Link>
-          <Link to="/agent/rules" className="link-item">
-            Правила агента (AGENT.md)
-          </Link>
-          <Link to="/agent/tools" className="link-item">
-            Инструменты
-          </Link>
-          <Link to="/agent/channel" className="link-item">
-            Каналы связи
-          </Link>
-        </div>
-      </div>
     </div>
   )
 }

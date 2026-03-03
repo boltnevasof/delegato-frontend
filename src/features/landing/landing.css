@@ -158,34 +158,41 @@
 
 /* Profile avatar */
 .landing .l-avatar {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  margin-left: 2px;
+}
+
+.landing .l-avatar-icon {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #1f5eff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  text-decoration: none;
+  background: #2f6dff;
   position: relative;
 }
 
-.landing .l-avatar-body {
-  width: 12px;
-  height: 12px;
+.landing .l-avatar-head {
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #fff;
   position: absolute;
-  bottom: 6px;
+  left: 50%;
+  top: 5px;
+  transform: translateX(-50%);
 }
 
-.landing .l-avatar-head {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.landing .l-avatar-body {
+  width: 20px;
+  height: 12px;
+  border-radius: 10px 10px 9px 9px;
   background: #fff;
   position: absolute;
-  top: 7px;
+  left: 50%;
+  bottom: 5px;
+  transform: translateX(-50%);
 }
 
 /* Hero — extra padding-top for fixed header (~60px) */

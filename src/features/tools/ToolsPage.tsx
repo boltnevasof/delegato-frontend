@@ -1,22 +1,25 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getAgent } from '../../api/agents'
-import { getCatalog, toggleTool, removeTool } from '../../api/tools'
+import { getCatalog, addTool, toggleTool, removeTool } from '../../api/tools'
 import { useApiError } from '../../shared/hooks/useApiError'
-import { ErrorBanner, Spinner } from '../../shared/ui'
+import { Button, ErrorBanner, Spinner } from '../../shared/ui'
 import { DashboardEmpty } from '../dashboard/DashboardEmpty'
 import { ToolCard } from './ToolCard'
 import { ToolDetailModal } from './ToolDetailModal'
-import { ToolConnectModal } from './ToolConnectModal'
 import type { components } from '../../api/generated/schema'
 
 type ToolCatalogItem = components['schemas']['ToolCatalogItem']
+type ToolTab = 'installed' | 'marketplace'
+
+const PAGE_SIZE = 6
 
 export function ToolsPage() {
   const queryClient = useQueryClient()
   const { error, setError, clearError } = useApiError()
   const [detailTool, setDetailTool] = useState<ToolCatalogItem | null>(null)
-  const [connectTool, setConnectTool] = useState<ToolCatalogItem | null>(null)
+  const [activeTab, setActiveTab] = useState<ToolTab>('installed')
+  const [page, setPage] = useState(1)
 
   const agentQuery = useQuery({ queryKey: ['agent'], queryFn: getAgent })
   const catalogQuery = useQuery({ queryKey: ['toolCatalog'], queryFn: getCatalog })
@@ -25,6 +28,16 @@ export function ToolsPage() {
   const catalog = catalogQuery.data
 
   const installedSlugs = new Set(agent?.tools.map((t) => t.slug) ?? [])
+
+  async function handleConnect(toolId: string) {
+    clearError()
+    try {
+      await addTool(toolId)
+      queryClient.invalidateQueries({ queryKey: ['agent'] })
+    } catch (err) {
+      setError(err)
+    }
+  }
 
   async function handleToggle(agentToolId: string, enabled: boolean) {
     clearError()
@@ -44,10 +57,6 @@ export function ToolsPage() {
     } catch (err) {
       setError(err)
     }
-  }
-
-  function handleConnected() {
-    queryClient.invalidateQueries({ queryKey: ['agent'] })
   }
 
   if (agentQuery.isLoading || catalogQuery.isLoading) {
@@ -81,33 +90,64 @@ export function ToolsPage() {
 
   const installedTools = catalog?.tools.filter((t) => installedSlugs.has(t.slug)) ?? []
   const availableTools = catalog?.tools.filter((t) => !installedSlugs.has(t.slug)) ?? []
+  const currentItems = activeTab === 'installed' ? installedTools : availableTools
+  const totalPages = Math.max(1, Math.ceil(currentItems.length / PAGE_SIZE))
+  const safePage = Math.min(page, totalPages)
+  const start = (safePage - 1) * PAGE_SIZE
+  const paginatedItems = currentItems.slice(start, start + PAGE_SIZE)
+
+  function changeTab(tab: ToolTab) {
+    setActiveTab(tab)
+    setPage(1)
+  }
 
   function findAgentTool(catalogSlug: string) {
     return agent?.tools.find((t) => t.slug === catalogSlug)
   }
 
   return (
-    <div className="page-wrap">
+    <div className="page-wrap page-wrap--wide skills-marketplace-page">
       <h1>Инструменты</h1>
 
       {error && <ErrorBanner message={error.message} />}
 
-      <h2>Подключённые</h2>
-      {installedTools.length === 0 ? (
-        <p className="text-muted">У вас пока нет подключённых инструментов</p>
+      <div className="marketplace-tabs" role="tablist" aria-label="Фильтр инструментов">
+        <button
+          type="button"
+          className={`marketplace-tab ${activeTab === 'installed' ? 'active' : ''}`}
+          onClick={() => changeTab('installed')}
+        >
+          Установленные ({installedTools.length})
+        </button>
+        <button
+          type="button"
+          className={`marketplace-tab ${activeTab === 'marketplace' ? 'active' : ''}`}
+          onClick={() => changeTab('marketplace')}
+        >
+          Маркетплейс ({availableTools.length})
+        </button>
+      </div>
+
+      {currentItems.length === 0 ? (
+        <p className="text-muted mt-16">
+          {activeTab === 'installed'
+            ? 'У вас пока нет подключённых инструментов.'
+            : 'Все доступные инструменты уже установлены.'}
+        </p>
       ) : (
-        <div className="tool-grid">
-          {installedTools.map((tool) => {
+        <div className="marketplace-plugin-grid">
+          {paginatedItems.map((tool) => {
             const agentTool = findAgentTool(tool.slug)
             return (
               <ToolCard
                 key={tool.id}
                 tool={tool}
-                isInstalled
+                isInstalled={activeTab === 'installed'}
                 isEnabled={agentTool?.is_enabled}
                 agentToolId={agentTool?.id}
                 onToggle={handleToggle}
                 onDisconnect={handleDisconnect}
+                onConnect={handleConnect}
                 onDetail={() => setDetailTool(tool)}
               />
             )
@@ -115,28 +155,33 @@ export function ToolsPage() {
         </div>
       )}
 
-      <h2 className="mt-32">Доступные инструменты</h2>
-      <div className="tool-grid">
-        {availableTools.map((tool) => (
-          <ToolCard
-            key={tool.id}
-            tool={tool}
-            isInstalled={false}
-            onConnect={() => setConnectTool(tool)}
-            onDetail={() => setDetailTool(tool)}
-          />
-        ))}
-      </div>
+      {currentItems.length > PAGE_SIZE && (
+        <div className="marketplace-pagination">
+          <Button
+            variant="secondary"
+            size="small"
+            disabled={safePage <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+          >
+            Назад
+          </Button>
+          <span className="text-muted">Страница {safePage} из {totalPages}</span>
+          <Button
+            variant="secondary"
+            size="small"
+            disabled={safePage >= totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+          >
+            Далее
+          </Button>
+        </div>
+      )}
 
       <ToolDetailModal
         tool={detailTool}
+        isInstalled={detailTool ? installedSlugs.has(detailTool.slug) : false}
         onClose={() => setDetailTool(null)}
-      />
-
-      <ToolConnectModal
-        tool={connectTool}
-        onClose={() => setConnectTool(null)}
-        onConnected={handleConnected}
+        onConnect={handleConnect}
       />
     </div>
   )

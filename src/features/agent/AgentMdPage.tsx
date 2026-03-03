@@ -51,7 +51,7 @@ export function AgentMdPage() {
 
   return (
     <EditorForm
-      title="Правила агента (AGENT.md)"
+      title="Правила агента"
       content={agent?.agent_md ?? ''}
       onSave={handleSave}
       onEnhance={handleEnhance}

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { getTariffs } from '../../api/tariffs'
 import { subscribe } from '../../api/payments'
@@ -51,41 +51,49 @@ export function PricingPage() {
   const tariffs = data?.tariffs ?? []
 
   return (
-    <div className="page-wrap">
-      <div className="auth-container" style={{ maxWidth: 900 }}>
-        <h1>Выберите тариф</h1>
-        <p className="subtitle">Начните использовать AI-ассистента прямо сейчас</p>
+    <div className="auth-layout">
+      <header className="header">
+        <NavLink to="/" className="header-logo">
+          Delegato
+        </NavLink>
+      </header>
 
-        {error && <ErrorBanner message={error.message} onRetry={() => { clearError(); refetch() }} />}
+      <div className="page-wrap page-wrap--centered">
+        <div className="auth-container" style={{ maxWidth: 1240 }}>
+          <h1>Выберите тариф</h1>
+          <p className="subtitle">Начните использовать AI-ассистента прямо сейчас</p>
 
-        <div className="pricing-grid">
-          {tariffs.map((tariff) => (
-            <Card key={tariff.id} className="pricing-card">
-              <h3>{tariff.name}</h3>
-              <div className="pricing-price">{formatPrice(tariff.price_rub)}</div>
+          {error && <ErrorBanner message={error.message} onRetry={() => { clearError(); refetch() }} />}
 
-              <ul className="pricing-features">
-                {tariff.llm_model && (
-                  <li>Модель: <strong>{tariff.llm_model}</strong></li>
-                )}
-                {tariff.max_channels !== null && (
-                  <li>Каналов: до {tariff.max_channels}</li>
-                )}
-                <li>Доступ к скиллам: <Badge>{tariff.skills_access}</Badge></li>
-                {tariff.is_self_service && <li>Self-service настройка</li>}
-              </ul>
+          <div className="pricing-grid">
+            {tariffs.map((tariff) => (
+              <Card key={tariff.id} className="pricing-card">
+                <h3>{tariff.name}</h3>
+                <div className="pricing-price">{formatPrice(tariff.price_rub)}</div>
 
-              <Button
-                variant="primary"
-                style={{ width: '100%' }}
-                loading={subscribingId === tariff.id}
-                disabled={subscribingId !== null}
-                onClick={() => handleSubscribe(tariff.id)}
-              >
-                Оплатить
-              </Button>
-            </Card>
-          ))}
+                <ul className="pricing-features">
+                  {tariff.llm_model && (
+                    <li>Модель: <strong>{tariff.llm_model}</strong></li>
+                  )}
+                  {tariff.max_channels !== null && (
+                    <li>Каналов: до {tariff.max_channels}</li>
+                  )}
+                  <li>Доступ к скиллам: <Badge>{tariff.skills_access}</Badge></li>
+                  {tariff.is_self_service && <li>Self-service настройка</li>}
+                </ul>
+
+                <Button
+                  variant="primary"
+                  style={{ width: '100%' }}
+                  loading={subscribingId === tariff.id}
+                  disabled={subscribingId !== null}
+                  onClick={() => handleSubscribe(tariff.id)}
+                >
+                  Оплатить
+                </Button>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     </div>

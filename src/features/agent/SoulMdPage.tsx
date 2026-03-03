@@ -52,7 +52,7 @@ export function SoulMdPage() {
 
   return (
     <EditorForm
-      title="Личность агента (SOUL.md)"
+      title="Личность агента"
       content={agent?.soul_md ?? ''}
       onSave={handleSave}
       onEnhance={handleEnhance}

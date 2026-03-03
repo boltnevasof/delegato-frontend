@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { useApiError } from '../../shared/hooks/useApiError'
-import { Button, TextArea, ErrorBanner, Spinner } from '../../shared/ui'
+import { Button, TextArea, ErrorBanner } from '../../shared/ui'
 
 type EditorFormProps = {
   content: string | null
@@ -26,13 +26,17 @@ export function EditorForm({ content, onSave, onEnhance, title }: EditorFormProp
     defaultValues: { content: content ?? '' },
   })
 
+  const isPersonality = title.toLowerCase().includes('личность')
+  const helperText = isPersonality
+    ? 'Опишите характер, стиль общения и тон вашего агента. Эти настройки влияют на то, как он формулирует ответы, ведет диалог и воспринимается клиентами.'
+    : 'Зафиксируйте правила, ограничения и приоритеты работы агента. Эти настройки определяют, какие действия он делает, какие не делает и как принимает решения в спорных ситуациях.'
+
   useEffect(() => {
     if (content !== null) {
       setValue('content', content)
     }
   }, [content, setValue])
 
-  // Auto-hide success message
   useEffect(() => {
     if (!saved) return
     const timer = setTimeout(() => setSaved(false), 2000)
@@ -69,7 +73,7 @@ export function EditorForm({ content, onSave, onEnhance, title }: EditorFormProp
   }
 
   return (
-    <div className="page-wrap">
+    <div className="page-wrap page-wrap--wide agent-editor-page">
       <h1>{title}</h1>
 
       {error && <ErrorBanner message={error.message} />}
@@ -78,27 +82,32 @@ export function EditorForm({ content, onSave, onEnhance, title }: EditorFormProp
         <div className="success-banner mb-16">Сохранено</div>
       )}
 
-      <form onSubmit={handleSubmit(handleSave)}>
+      <form onSubmit={handleSubmit(handleSave)} className="agent-editor-shell">
         <TextArea
           {...register('content')}
-          rows={16}
+          className="agent-editor-input"
+          rows={14}
           disabled={saving || enhancing}
-          style={{ fontFamily: 'monospace' }}
+          placeholder={isPersonality
+            ? 'Опишите, каким должен быть ваш агент: стиль, тон, формат общения, поведение в диалоге...'
+            : 'Опишите правила работы агента: что обязательно делать, что запрещено, как действовать в нестандартных случаях...'}
         />
 
-        <div className="form-actions mt-16">
-          <Button type="submit" loading={saving} disabled={enhancing}>
-            Сохранить
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            loading={enhancing}
-            disabled={saving}
-            onClick={handleEnhanceClick}
-          >
-            {enhancing ? 'Улучшаем...' : 'Улучшить с AI'}
-          </Button>
+        <div className="form-actions mt-16 agent-editor-actions">
+          <div className="agent-editor-actions-primary">
+            <Button type="submit" loading={saving} disabled={enhancing}>
+              Сохранить
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              loading={enhancing}
+              disabled={saving}
+              onClick={handleEnhanceClick}
+            >
+              {enhancing ? 'Улучшаем...' : 'Улучшить с AI'}
+            </Button>
+          </div>
           <Button
             type="button"
             variant="ghost"
@@ -108,6 +117,8 @@ export function EditorForm({ content, onSave, onEnhance, title }: EditorFormProp
             Отмена
           </Button>
         </div>
+
+        <p className="agent-editor-helper">{helperText}</p>
       </form>
     </div>
   )
