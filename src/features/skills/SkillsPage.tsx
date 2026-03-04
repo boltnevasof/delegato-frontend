@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getAgent } from '../../api/agents'
-import { getCatalog, addSkill, toggleSkill, removeSkill } from '../../api/skills'
+import { getCatalog, addSkill, removeSkill } from '../../api/skills'
 import { useApiError } from '../../shared/hooks/useApiError'
 import { Button, ErrorBanner, Spinner } from '../../shared/ui'
 import { DashboardEmpty } from '../dashboard/DashboardEmpty'
@@ -38,17 +38,6 @@ export function SkillsPage() {
       setError(err)
     }
   }
-
-  async function handleToggle(agentSkillId: string, enabled: boolean) {
-    clearError()
-    try {
-      await toggleSkill(agentSkillId, enabled)
-      queryClient.invalidateQueries({ queryKey: ['agent'] })
-    } catch (err) {
-      setError(err)
-    }
-  }
-
   async function handleDisconnect(agentSkillId: string) {
     clearError()
     try {
@@ -145,9 +134,7 @@ export function SkillsPage() {
                 key={skill.id}
                 skill={skill}
                 isInstalled={activeTab === 'installed'}
-                isEnabled={agentSkill?.is_enabled}
                 agentSkillId={agentSkill?.id}
-                onToggle={handleToggle}
                 onDisconnect={handleDisconnect}
                 onConnect={handleConnect}
                 onDetail={() => setDetailSkill(skill)}

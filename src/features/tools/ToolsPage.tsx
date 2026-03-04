@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getAgent } from '../../api/agents'
-import { getCatalog, addTool, toggleTool, removeTool } from '../../api/tools'
+import { getCatalog, addTool, removeTool } from '../../api/tools'
 import { useApiError } from '../../shared/hooks/useApiError'
 import { Button, ErrorBanner, Spinner } from '../../shared/ui'
 import { DashboardEmpty } from '../dashboard/DashboardEmpty'
@@ -38,17 +38,6 @@ export function ToolsPage() {
       setError(err)
     }
   }
-
-  async function handleToggle(agentToolId: string, enabled: boolean) {
-    clearError()
-    try {
-      await toggleTool(agentToolId, enabled)
-      queryClient.invalidateQueries({ queryKey: ['agent'] })
-    } catch (err) {
-      setError(err)
-    }
-  }
-
   async function handleDisconnect(agentToolId: string) {
     clearError()
     try {
@@ -143,9 +132,7 @@ export function ToolsPage() {
                 key={tool.id}
                 tool={tool}
                 isInstalled={activeTab === 'installed'}
-                isEnabled={agentTool?.is_enabled}
                 agentToolId={agentTool?.id}
-                onToggle={handleToggle}
                 onDisconnect={handleDisconnect}
                 onConnect={handleConnect}
                 onDetail={() => setDetailTool(tool)}

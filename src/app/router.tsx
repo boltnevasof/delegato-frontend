@@ -32,6 +32,8 @@ const lazyTools = () => import('../features/tools/ToolsPage').then(m => ({ Compo
 const lazyChan = () => import('../features/channels/ChannelPage').then(m => ({ Component: m.ChannelPage }))
 const lazySub = () => import('../features/billing/SubscriptionPage').then(m => ({ Component: m.SubscriptionPage }))
 const lazySup = () => import('../features/support/SupportPage').then(m => ({ Component: m.SupportPage }))
+const lazyAdmin = () => import('../features/admin/AdminPage').then(m => ({ Component: m.AdminPage }))
+const lazyAdminUserDetail = () => import('../features/admin/AdminUserDetailPage').then(m => ({ Component: m.AdminUserDetailPage }))
 const lazyLanding = () => import('../features/landing/LandingPage').then(m => ({ Component: m.LandingPage }))
 
 export const router = createBrowserRouter([
@@ -71,6 +73,8 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  { path: '/admin', lazy: lazyAdmin },
+  { path: '/admin/users/:userId', lazy: lazyAdminUserDetail },
   { path: '/', lazy: lazyLanding },
   { path: '*', element: <Navigate to="/" replace /> },
 ])

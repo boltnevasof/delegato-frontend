@@ -1,15 +1,13 @@
 import type { KeyboardEvent } from 'react'
 import type { components } from '../../api/generated/schema'
-import { Button, Badge, Toggle } from '../../shared/ui'
+import { Button } from '../../shared/ui'
 
 type SkillCatalogItem = components['schemas']['SkillCatalogItem']
 
 type SkillCardProps = {
   skill: SkillCatalogItem
   isInstalled: boolean
-  isEnabled?: boolean
   agentSkillId?: string
-  onToggle?: (id: string, enabled: boolean) => void
   onConnect?: (skillId: string) => void
   onDisconnect?: (agentSkillId: string) => void
   onDetail?: () => void
@@ -24,9 +22,7 @@ function getInitials(name: string): string {
 export function SkillCard({
   skill,
   isInstalled,
-  isEnabled,
   agentSkillId,
-  onToggle,
   onConnect,
   onDisconnect,
   onDetail,
@@ -62,17 +58,6 @@ export function SkillCard({
       <div className="marketplace-plugin-main">
         <div className="marketplace-plugin-head">
           <h3>{skill.name}</h3>
-          <div className="marketplace-plugin-right">
-            <Badge variant="plan">{skill.access_level}</Badge>
-            {isInstalled && agentSkillId && onToggle && (
-              <div onClick={(e) => e.stopPropagation()}>
-                <Toggle
-                  checked={!!isEnabled}
-                  onChange={(checked) => onToggle(agentSkillId, checked)}
-                />
-              </div>
-            )}
-          </div>
         </div>
 
         <p>{skill.description}</p>

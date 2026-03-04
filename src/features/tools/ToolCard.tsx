@@ -1,15 +1,13 @@
 import type { KeyboardEvent } from 'react'
 import type { components } from '../../api/generated/schema'
-import { Button, Toggle } from '../../shared/ui'
+import { Button } from '../../shared/ui'
 
 type ToolCatalogItem = components['schemas']['ToolCatalogItem']
 
 type ToolCardProps = {
   tool: ToolCatalogItem
   isInstalled: boolean
-  isEnabled?: boolean
   agentToolId?: string
-  onToggle?: (id: string, enabled: boolean) => void
   onConnect?: (toolId: string) => void
   onDisconnect?: (agentToolId: string) => void
   onDetail?: () => void
@@ -24,9 +22,7 @@ function getInitials(name: string): string {
 export function ToolCard({
   tool,
   isInstalled,
-  isEnabled,
   agentToolId,
-  onToggle,
   onConnect,
   onDisconnect,
   onDetail,
@@ -54,16 +50,6 @@ export function ToolCard({
       <div className="marketplace-plugin-main">
         <div className="marketplace-plugin-head">
           <h3>{tool.name}</h3>
-          <div className="marketplace-plugin-right">
-            {isInstalled && agentToolId && onToggle && (
-              <div onClick={(e) => e.stopPropagation()}>
-                <Toggle
-                  checked={!!isEnabled}
-                  onChange={(checked) => onToggle(agentToolId, checked)}
-                />
-              </div>
-            )}
-          </div>
         </div>
 
         <p>{tool.description}</p>

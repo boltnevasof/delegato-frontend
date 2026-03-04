@@ -453,6 +453,8 @@
   border-radius: 22px;
   padding: 1.1rem;
   position: relative;
+  display: flex;
+  flex-direction: column;
   box-shadow: none;
 }
 
@@ -478,6 +480,11 @@
 .landing .l-price-card ul {
   margin: 0.8rem 0 1.05rem;
   padding-left: 1.05rem;
+  flex: 1;
+}
+
+.landing .l-price-card .l-btn {
+  margin-top: auto;
 }
 
 .landing .l-price-card li {
@@ -487,7 +494,6 @@
 
 .landing .l-featured {
   border-color: #1f5eff;
-  transform: translateY(-5px);
 }
 
 .landing .l-chip {

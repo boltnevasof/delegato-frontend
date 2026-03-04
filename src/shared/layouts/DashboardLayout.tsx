@@ -108,7 +108,7 @@ export function DashboardLayout() {
   return (
     <>
       <header className="header">
-        <NavLink to="/dashboard" className="header-logo">
+        <NavLink to="/" className="header-logo">
           Delegato
         </NavLink>
         <div className="header-right">
