@@ -1,0 +1,477 @@
+import { useEffect, useMemo, useState } from 'react'
+import type { FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
+import type { components } from '../../api/generated/schema'
+import {
+  adminLogin,
+  clearAdminAccessToken,
+  getAdminAccessToken,
+  getAdminServerLogs,
+  getAdminServerStats,
+  listAdminAgents,
+  listAdminCustomRequests,
+  listAdminOtpCodes,
+  listAdminServers,
+  listAdminUsers,
+} from '../../api/admin'
+import { Button, Card, ErrorBanner, Input } from '../../shared/ui'
+import { AdminTable, type AdminTableColumn } from './components/AdminTable'
+
+type TabKey =
+  | 'users'
+  | 'servers'
+  | 'servers_stats'
+  | 'server_logs'
+  | 'agents'
+  | 'custom_requests'
+  | 'otp_codes'
+
+type AdminUserListItem = components['schemas']['AdminUserListItem']
+type AdminUserListResponse = components['schemas']['AdminUserListResponse']
+type AdminServerListItem = components['schemas']['AdminServerListItem']
+type AdminServerListResponse = components['schemas']['AdminServerListResponse']
+type AdminServerStats = components['schemas']['AdminServerStats']
+type ServerLogItem = components['schemas']['ServerLogItem']
+type ServerLogListResponse = components['schemas']['ServerLogListResponse']
+type AdminAgentListItem = components['schemas']['AdminAgentListItem']
+type AdminAgentListResponse = components['schemas']['AdminAgentListResponse']
+type AdminCustomRequestItem = components['schemas']['AdminCustomRequestItem']
+type AdminCustomRequestListResponse = components['schemas']['AdminCustomRequestListResponse']
+type AdminOTPCodeItem = components['schemas']['AdminOTPCodeItem']
+type AdminOTPCodeListResponse = components['schemas']['AdminOTPCodeListResponse']
+
+type ListData =
+  | AdminUserListResponse
+  | AdminServerListResponse
+  | ServerLogListResponse
+  | AdminAgentListResponse
+  | AdminCustomRequestListResponse
+  | AdminOTPCodeListResponse
+
+const TABS: { key: TabKey; label: string }[] = [
+  { key: 'users', label: 'Пользователи' },
+  { key: 'servers', label: 'Серверы' },
+  { key: 'servers_stats', label: 'Статистика серверов' },
+  { key: 'server_logs', label: 'Логи сервера' },
+  { key: 'agents', label: 'Агенты' },
+  { key: 'custom_requests', label: 'Заявки' },
+  { key: 'otp_codes', label: 'OTP-коды' },
+]
+
+function formatDate(value?: string): string {
+  if (!value) return '—'
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value
+  return date.toLocaleString('ru-RU')
+}
+
+function shortId(value?: string | null): string {
+  if (!value) return '—'
+  return value.length > 8 ? value.slice(0, 8) + '...' : value
+}
+
+function isPaginatedResponse(data: unknown): data is ListData {
+  return Boolean(
+    data &&
+    typeof data === 'object' &&
+    'items' in data &&
+    'total' in data &&
+    'page' in data &&
+    'per_page' in data,
+  )
+}
+
+export function AdminPage() {
+  const navigate = useNavigate()
+  const [isAuthenticated, setIsAuthenticated] = useState(Boolean(getAdminAccessToken()))
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+
+  const [activeTab, setActiveTab] = useState<TabKey>('users')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const [page, setPage] = useState(1)
+  const perPage = 20
+
+  const [search, setSearch] = useState('')
+  const [serverStatus, setServerStatus] = useState('')
+  const [serverId, setServerId] = useState('')
+  const [logLevel, setLogLevel] = useState('')
+  const [customStatus, setCustomStatus] = useState('')
+  const [otpEmail, setOtpEmail] = useState('')
+
+  const [listData, setListData] = useState<ListData | null>(null)
+  const [statsData, setStatsData] = useState<AdminServerStats | null>(null)
+
+  const totalPages = useMemo(() => {
+    if (!listData) return 1
+    return Math.max(1, Math.ceil(listData.total / listData.per_page))
+  }, [listData])
+
+  const runRequest = async (callback: () => Promise<void>) => {
+    setError(null)
+    setLoading(true)
+    try {
+      await callback()
+    } catch (e) {
+      setError((e as { message?: string }).message || 'Ошибка запроса')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadData = async (targetPage = page) => {
+    await runRequest(async () => {
+      setStatsData(null)
+
+      if (activeTab === 'servers_stats') {
+        const stats = await getAdminServerStats()
+        setStatsData(stats)
+        setListData(null)
+        return
+      }
+
+      let data: ListData
+      switch (activeTab) {
+        case 'users':
+          data = await listAdminUsers(targetPage, perPage, search || undefined)
+          break
+        case 'servers':
+          data = await listAdminServers(targetPage, perPage, serverStatus || undefined)
+          break
+        case 'server_logs':
+          if (!serverId.trim()) throw new Error('Укажите server_id для просмотра логов')
+          data = await getAdminServerLogs(serverId.trim(), targetPage, perPage, logLevel || undefined)
+          break
+        case 'agents':
+          data = await listAdminAgents(targetPage, perPage)
+          break
+        case 'custom_requests':
+          data = await listAdminCustomRequests(targetPage, perPage, customStatus || undefined)
+          break
+        case 'otp_codes':
+          data = await listAdminOtpCodes(targetPage, perPage, otpEmail || undefined)
+          break
+        default:
+          data = await listAdminUsers(targetPage, perPage, search || undefined)
+      }
+
+      setListData(data)
+      setPage(data.page)
+    })
+  }
+
+  const handleLogin = async (event: FormEvent) => {
+    event.preventDefault()
+    await runRequest(async () => {
+      await adminLogin({ username, password })
+      setIsAuthenticated(true)
+    })
+  }
+
+  const handleLogout = () => {
+    clearAdminAccessToken()
+    setIsAuthenticated(false)
+    setListData(null)
+    setStatsData(null)
+    setError(null)
+  }
+
+  useEffect(() => {
+    if (!isAuthenticated) return
+    setPage(1)
+    setListData(null)
+    setStatsData(null)
+  }, [activeTab, isAuthenticated])
+
+  if (!isAuthenticated) {
+    return (
+      <div className="admin-auth-wrap">
+        <Card>
+          <h1 className="admin-auth-title">Вход в админку</h1>
+          <form className="admin-login-form" onSubmit={handleLogin}>
+            <Input
+              label="Логин"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              autoComplete="username"
+            />
+            <Input
+              label="Пароль"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="current-password"
+            />
+            <Button type="submit" loading={loading}>Войти</Button>
+          </form>
+          {error && <ErrorBanner message={error} />}
+        </Card>
+      </div>
+    )
+  }
+
+  const userColumns: AdminTableColumn<AdminUserListItem>[] = [
+    {
+      key: 'id',
+      header: 'ID',
+      render: (user) => (
+        <button
+          type="button"
+          className="admin-id-link"
+          onClick={() => navigate(`/admin/users/${user.id}`, { state: { user } })}
+        >
+          {shortId(user.id)}
+        </button>
+      ),
+    },
+    { key: 'email', header: 'Email', render: (user) => user.email },
+    { key: 'name', header: 'Имя', render: (user) => user.name || '—' },
+    { key: 'role', header: 'Роль', render: (user) => user.role },
+    { key: 'active', header: 'Активен', render: (user) => (user.is_active ? 'Да' : 'Нет') },
+    { key: 'created', header: 'Создан', render: (user) => formatDate(user.created_at) },
+  ]
+
+  const serverColumns: AdminTableColumn<AdminServerListItem>[] = [
+    { key: 'id', header: 'ID', render: (server) => shortId(server.id) },
+    { key: 'agent', header: 'Agent ID', render: (server) => shortId(server.agent_id) },
+    { key: 'status', header: 'Статус', render: (server) => server.status },
+    { key: 'ip', header: 'IP', render: (server) => server.ip_address || '—' },
+    { key: 'created', header: 'Создан', render: (server) => formatDate(server.created_at) },
+    {
+      key: 'logs',
+      header: '',
+      render: (server) => (
+        <button
+          type="button"
+          className="admin-id-link"
+          onClick={() => {
+            setServerId(server.id || '')
+            setActiveTab('server_logs')
+          }}
+        >
+          Логи
+        </button>
+      ),
+    },
+  ]
+
+  const logColumns: AdminTableColumn<ServerLogItem>[] = [
+    { key: 'id', header: 'ID', render: (log) => shortId(log.id) },
+    { key: 'level', header: 'Уровень', render: (log) => log.level },
+    { key: 'stage', header: 'Этап', render: (log) => log.stage || '—' },
+    { key: 'message', header: 'Сообщение', render: (log) => log.message },
+    { key: 'created', header: 'Время', render: (log) => formatDate(log.created_at) },
+  ]
+
+  const agentColumns: AdminTableColumn<AdminAgentListItem>[] = [
+    { key: 'id', header: 'ID', render: (agent) => shortId(agent.id) },
+    { key: 'user', header: 'User ID', render: (agent) => shortId(agent.user_id) },
+    { key: 'status', header: 'Статус', render: (agent) => agent.status },
+    { key: 'step', header: 'Шаг onboarding', render: (agent) => agent.onboarding_step },
+    { key: 'created', header: 'Создан', render: (agent) => formatDate(agent.created_at) },
+  ]
+
+  const requestColumns: AdminTableColumn<AdminCustomRequestItem>[] = [
+    { key: 'id', header: 'ID', render: (request) => shortId(request.id) },
+    { key: 'user', header: 'User ID', render: (request) => shortId(request.user_id) },
+    { key: 'status', header: 'Статус', render: (request) => request.status },
+    { key: 'contact', header: 'Контакт', render: (request) => request.contact_info },
+    { key: 'created', header: 'Создана', render: (request) => formatDate(request.created_at) },
+  ]
+
+  const otpColumns: AdminTableColumn<AdminOTPCodeItem>[] = [
+    { key: 'id', header: 'ID', render: (otp) => shortId(otp.id) },
+    { key: 'email', header: 'Email', render: (otp) => otp.email },
+    { key: 'code', header: 'Код', render: (otp) => otp.code },
+    { key: 'used', header: 'Использован', render: (otp) => (otp.is_used ? 'Да' : 'Нет') },
+    { key: 'expires', header: 'Истекает', render: (otp) => formatDate(otp.expires_at) },
+    { key: 'created', header: 'Создан', render: (otp) => formatDate(otp.created_at) },
+  ]
+
+  return (
+    <div className="admin-page">
+      <div className="admin-head">
+        <h1>Администрирование</h1>
+        <Button variant="secondary" onClick={handleLogout}>Выйти</Button>
+      </div>
+
+      <Card>
+        <div className="admin-tabs">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              className={`admin-tab${activeTab === tab.key ? ' active' : ''}`}
+              onClick={() => setActiveTab(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-16">
+        <div className="admin-controls">
+          {activeTab === 'users' && (
+            <Input
+              label="Поиск"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="email или имя"
+            />
+          )}
+
+          {activeTab === 'servers' && (
+            <Input
+              label="Статус"
+              value={serverStatus}
+              onChange={(event) => setServerStatus(event.target.value)}
+              placeholder="active / error / provisioning"
+            />
+          )}
+
+          {activeTab === 'custom_requests' && (
+            <Input
+              label="Статус"
+              value={customStatus}
+              onChange={(event) => setCustomStatus(event.target.value)}
+              placeholder="new / contacted / closed"
+            />
+          )}
+
+          {activeTab === 'otp_codes' && (
+            <Input
+              label="Email"
+              value={otpEmail}
+              onChange={(event) => setOtpEmail(event.target.value)}
+              placeholder="user@example.com"
+            />
+          )}
+
+          {activeTab === 'server_logs' && (
+            <>
+              <Input
+                label="Server ID"
+                value={serverId}
+                onChange={(event) => setServerId(event.target.value)}
+                placeholder="uuid"
+              />
+              <Input
+                label="Уровень"
+                value={logLevel}
+                onChange={(event) => setLogLevel(event.target.value)}
+                placeholder="info / warning / error"
+              />
+            </>
+          )}
+        </div>
+
+        <div className="admin-actions">
+          <Button onClick={() => loadData(1)} loading={loading}>Обновить</Button>
+        </div>
+      </Card>
+
+      {error && (
+        <div className="mt-16">
+          <ErrorBanner message={error} />
+        </div>
+      )}
+
+      {statsData && (
+        <Card className="mt-16">
+          <div className="admin-stats-grid">
+            <div className="admin-stat-card"><span>Всего</span><strong>{statsData.total}</strong></div>
+            <div className="admin-stat-card"><span>Активные</span><strong>{statsData.active}</strong></div>
+            <div className="admin-stat-card"><span>Provisioning</span><strong>{statsData.provisioning}</strong></div>
+            <div className="admin-stat-card"><span>Ошибка</span><strong>{statsData.error}</strong></div>
+            <div className="admin-stat-card"><span>Остановлены</span><strong>{statsData.stopped}</strong></div>
+          </div>
+        </Card>
+      )}
+
+      {activeTab === 'users' && listData && (
+        <AdminTable
+          title="Пользователи"
+          columns={userColumns}
+          rows={listData.items as AdminUserListItem[]}
+          rowKey={(row) => row.id}
+        />
+      )}
+
+      {activeTab === 'servers' && listData && (
+        <AdminTable
+          title="Серверы"
+          columns={serverColumns}
+          rows={listData.items as AdminServerListItem[]}
+          rowKey={(row) => row.id}
+        />
+      )}
+
+      {activeTab === 'server_logs' && listData && (
+        <AdminTable
+          title="Логи сервера"
+          columns={logColumns}
+          rows={listData.items as ServerLogItem[]}
+          rowKey={(row) => row.id}
+        />
+      )}
+
+      {activeTab === 'agents' && listData && (
+        <AdminTable
+          title="Агенты"
+          columns={agentColumns}
+          rows={listData.items as AdminAgentListItem[]}
+          rowKey={(row) => row.id}
+        />
+      )}
+
+      {activeTab === 'custom_requests' && listData && (
+        <AdminTable
+          title="Кастомные заявки"
+          columns={requestColumns}
+          rows={listData.items as AdminCustomRequestItem[]}
+          rowKey={(row) => row.id}
+        />
+      )}
+
+      {activeTab === 'otp_codes' && listData && (
+        <AdminTable
+          title="OTP-коды"
+          columns={otpColumns}
+          rows={listData.items as AdminOTPCodeItem[]}
+          rowKey={(row) => row.id}
+        />
+      )}
+
+      {isPaginatedResponse(listData) && activeTab !== 'servers_stats' && (
+        <div className="admin-list-footer">
+          <div className="admin-pagination">
+            <button
+              type="button"
+              className="admin-page-arrow"
+              onClick={() => loadData(Math.max(1, page - 1))}
+              disabled={loading || page <= 1}
+              aria-label="Предыдущая страница"
+            >
+              {'<'}
+            </button>
+            <span>
+              {page} / {totalPages}
+            </span>
+            <button
+              type="button"
+              className="admin-page-arrow"
+              onClick={() => loadData(Math.min(totalPages, page + 1))}
+              disabled={loading || page >= totalPages}
+              aria-label="Следующая страница"
+            >
+              {'>'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
