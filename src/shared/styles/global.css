@@ -2474,3 +2474,35 @@ textarea.form-input {
   text-decoration: underline;
   padding: 0;
 }
+
+.admin-description-preview {
+  display: inline-block;
+  max-width: 340px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-support-detail pre {
+  margin: 8px 0 0;
+  padding: 10px;
+  border: 1px solid #dce4ef;
+  border-radius: 6px;
+  background: #f8fafc;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.support-page--success {
+  min-height: calc(100vh - var(--header-height));
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.support-page--success .support-success {
+  padding: 0;
+}

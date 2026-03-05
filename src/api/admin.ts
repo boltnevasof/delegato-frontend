@@ -42,6 +42,24 @@ export type AdminTariffListResponse = {
   per_page: number
 }
 
+export type AdminSupportRequestItem = {
+  id: string
+  user_id: string
+  topic: string
+  description: string
+  contact_method: string
+  contact: string
+  status: string
+  created_at: string
+}
+
+export type AdminSupportRequestListResponse = {
+  items: AdminSupportRequestItem[]
+  total: number
+  page: number
+  per_page: number
+}
+
 export type AdminTariffResponse = AdminTariffListItem
 
 export type AdminCreateTariffRequest = {
@@ -147,6 +165,16 @@ export function listAdminCustomRequests(
   const params = new URLSearchParams({ page: String(page), per_page: String(perPage) })
   if (status) params.set('status', status)
   return adminRequest<AdminCustomRequestListResponse>(`/admin/custom-requests?${params.toString()}`)
+}
+
+export function listAdminSupportRequests(
+  page = 1,
+  perPage = 20,
+  status?: string,
+): Promise<AdminSupportRequestListResponse> {
+  const params = new URLSearchParams({ page: String(page), per_page: String(perPage) })
+  if (status) params.set('status', status)
+  return adminRequest<AdminSupportRequestListResponse>(`/admin/support-requests?${params.toString()}`)
 }
 
 export function updateAdminUser(

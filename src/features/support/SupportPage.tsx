@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import { Button } from '../../shared/ui'
+import { createSupportRequest } from '../../api/support'
+import { useApiError } from '../../shared/hooks/useApiError'
+import { Button, ErrorBanner } from '../../shared/ui'
 
 const TOPICS = [
   { value: 'agent', label: 'Агент' },
@@ -28,6 +30,8 @@ type FormValues = {
 export function SupportPage() {
   const navigate = useNavigate()
   const [ticketId, setTicketId] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const { error, setError, clearError } = useApiError()
 
   const {
     register,
@@ -44,19 +48,33 @@ export function SupportPage() {
     },
   })
 
-  function onSubmit(_data: FormValues) {
-    const id = `SUP-${Date.now()}`
-    setTicketId(id)
+  async function onSubmit(data: FormValues) {
+    clearError()
+    setSubmitting(true)
+    try {
+      const response = await createSupportRequest({
+        topic: data.topic,
+        description: data.description,
+        contact_method: data.contactMethod,
+        contact: data.contact,
+      })
+      setTicketId(response.id)
+    } catch (err) {
+      setError(err)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   function handleReset() {
     setTicketId(null)
+    clearError()
     reset()
   }
 
   if (ticketId) {
     return (
-      <div className="support-page">
+      <div className="support-page support-page--success">
         <div className="support-success">
           <div className="styled-indicator styled-indicator--success">{'\u2713'}</div>
           <h2>Обращение отправлено</h2>
@@ -78,6 +96,8 @@ export function SupportPage() {
     <div className="support-page">
       <h1>Поддержка</h1>
       <p className="text-muted mb-24">Опишите вашу проблему, и мы свяжемся с вами</p>
+
+      {error && <ErrorBanner message={error.message} onRetry={clearError} />}
 
       <form className="support-form" onSubmit={handleSubmit(onSubmit)}>
         <div className="form-group">
@@ -146,7 +166,7 @@ export function SupportPage() {
           {errors.consent && <span className="form-error">{errors.consent.message}</span>}
         </div>
 
-        <Button type="submit" style={{ width: '100%' }}>
+        <Button type="submit" style={{ width: '100%' }} loading={submitting}>
           Отправить
         </Button>
       </form>

@@ -11,14 +11,16 @@ import {
   getAdminServerLogs,
   getAdminServerStats,
   listAdminAgents,
-  listAdminCustomRequests,
   listAdminOtpCodes,
   listAdminServers,
+  listAdminSupportRequests,
   listAdminTariffs,
   listAdminUsers,
   updateAdminTariff,
 } from '../../api/admin'
 import type {
+  AdminSupportRequestItem,
+  AdminSupportRequestListResponse,
   AdminTariffListItem,
   AdminTariffListResponse,
   AdminCreateTariffRequest,
@@ -44,8 +46,6 @@ type ServerLogItem = components['schemas']['ServerLogItem']
 type ServerLogListResponse = components['schemas']['ServerLogListResponse']
 type AdminAgentListItem = components['schemas']['AdminAgentListItem']
 type AdminAgentListResponse = components['schemas']['AdminAgentListResponse']
-type AdminCustomRequestItem = components['schemas']['AdminCustomRequestItem']
-type AdminCustomRequestListResponse = components['schemas']['AdminCustomRequestListResponse']
 type AdminOTPCodeItem = components['schemas']['AdminOTPCodeItem']
 type AdminOTPCodeListResponse = components['schemas']['AdminOTPCodeListResponse']
 
@@ -54,7 +54,7 @@ type ListData =
   | AdminServerListResponse
   | ServerLogListResponse
   | AdminAgentListResponse
-  | AdminCustomRequestListResponse
+  | AdminSupportRequestListResponse
   | AdminOTPCodeListResponse
   | AdminTariffListResponse
 
@@ -102,6 +102,13 @@ const EMPTY_TARIFF_FORM: AdminCreateTariffRequest = {
   is_active: true,
 }
 
+function descriptionPreview(value?: string | null): string {
+  const text = value ?? ''
+  if (!text) return '—'
+  if (text.length <= 60) return text
+  return text.slice(0, 60) + '...'
+}
+
 export function AdminPage() {
   const navigate = useNavigate()
   const [isAuthenticated, setIsAuthenticated] = useState(Boolean(getAdminAccessToken()))
@@ -126,6 +133,7 @@ export function AdminPage() {
   const [listData, setListData] = useState<ListData | null>(null)
   const [statsData, setStatsData] = useState<AdminServerStats | null>(null)
   const [serverLogsData, setServerLogsData] = useState<ServerLogListResponse | null>(null)
+  const [selectedSupportRequest, setSelectedSupportRequest] = useState<AdminSupportRequestItem | null>(null)
 
   // Tariff form state
   const [tariffForm, setTariffForm] = useState<AdminCreateTariffRequest>({ ...EMPTY_TARIFF_FORM })
@@ -180,7 +188,7 @@ export function AdminPage() {
           data = await listAdminAgents(targetPage, perPage)
           break
         case 'custom_requests':
-          data = await listAdminCustomRequests(targetPage, perPage, customStatus || undefined)
+          data = await listAdminSupportRequests(targetPage, perPage, customStatus || undefined)
           break
         case 'otp_codes':
           data = await listAdminOtpCodes(targetPage, perPage, otpEmail || undefined)
@@ -222,6 +230,7 @@ export function AdminPage() {
     setListData(null)
     setStatsData(null)
     setServerLogsData(null)
+    setSelectedSupportRequest(null)
     setError(null)
   }
 
@@ -276,6 +285,7 @@ export function AdminPage() {
     setStatsData(null)
     setServerLogsData(null)
     setShowTariffForm(false)
+    setSelectedSupportRequest(null)
     void loadData(1)
   }, [activeTab, isAuthenticated])
 
@@ -367,11 +377,30 @@ export function AdminPage() {
     { key: 'created', header: 'Создан', render: (agent) => formatDate(agent.created_at) },
   ]
 
-  const requestColumns: AdminTableColumn<AdminCustomRequestItem>[] = [
-    { key: 'id', header: 'ID', render: (request) => shortId(request.id) },
+  const requestColumns: AdminTableColumn<AdminSupportRequestItem>[] = [
+    {
+      key: 'id',
+      header: 'ID',
+      render: (request) => (
+        <button
+          type="button"
+          className="admin-id-link"
+          onClick={() => setSelectedSupportRequest(request)}
+        >
+          {shortId(request.id)}
+        </button>
+      ),
+    },
     { key: 'user', header: 'User ID', render: (request) => shortId(request.user_id) },
+    { key: 'topic', header: 'Тема', render: (request) => request.topic },
+    {
+      key: 'description',
+      header: 'Описание',
+      render: (request) => <span className="admin-description-preview">{descriptionPreview(request?.description)}</span>,
+    },
+    { key: 'method', header: 'Канал', render: (request) => request.contact_method },
+    { key: 'contact', header: 'Контакт', render: (request) => request.contact },
     { key: 'status', header: 'Статус', render: (request) => request.status },
-    { key: 'contact', header: 'Контакт', render: (request) => request.contact_info },
     { key: 'created', header: 'Создана', render: (request) => formatDate(request.created_at) },
   ]
 
@@ -469,7 +498,7 @@ export function AdminPage() {
               label="Статус"
               value={customStatus}
               onChange={(event) => setCustomStatus(event.target.value)}
-              placeholder="new / contacted / closed"
+              placeholder="new / in_progress / closed"
             />
           )}
 
@@ -563,11 +592,35 @@ export function AdminPage() {
 
       {activeTab === 'custom_requests' && listData && (
         <AdminTable
-          title="Кастомные заявки"
+          title="Заявки в поддержку"
           columns={requestColumns}
-          rows={filterRowsById(listData.items as AdminCustomRequestItem[])}
+          rows={filterRowsById(listData.items as AdminSupportRequestItem[])}
           rowKey={(row) => row.id}
         />
+      )}
+
+      {activeTab === 'custom_requests' && selectedSupportRequest && (
+        <Card className="mt-16 admin-support-detail">
+          <div className="admin-head-actions">
+            <h2 className="admin-section-title">Детали заявки</h2>
+            <Button variant="secondary" onClick={() => setSelectedSupportRequest(null)}>Закрыть</Button>
+          </div>
+          <div className="admin-section-grid">
+            <div>
+              <p><strong>ID:</strong> {selectedSupportRequest.id}</p>
+              <p><strong>User ID:</strong> {selectedSupportRequest.user_id}</p>
+              <p><strong>Тема:</strong> {selectedSupportRequest.topic}</p>
+              <p><strong>Канал:</strong> {selectedSupportRequest.contact_method}</p>
+              <p><strong>Контакт:</strong> {selectedSupportRequest.contact}</p>
+              <p><strong>Статус:</strong> {selectedSupportRequest.status}</p>
+              <p><strong>Создана:</strong> {formatDate(selectedSupportRequest.created_at)}</p>
+            </div>
+            <div>
+              <strong>Описание</strong>
+              <pre>{selectedSupportRequest.description || '—'}</pre>
+            </div>
+          </div>
+        </Card>
       )}
 
       {activeTab === 'otp_codes' && listData && (
