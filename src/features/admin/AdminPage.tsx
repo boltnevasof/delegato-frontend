@@ -21,7 +21,6 @@ type TabKey =
   | 'users'
   | 'servers'
   | 'servers_stats'
-  | 'server_logs'
   | 'agents'
   | 'custom_requests'
   | 'otp_codes'
@@ -52,7 +51,6 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'users', label: 'Пользователи' },
   { key: 'servers', label: 'Серверы' },
   { key: 'servers_stats', label: 'Статистика серверов' },
-  { key: 'server_logs', label: 'Логи сервера' },
   { key: 'agents', label: 'Агенты' },
   { key: 'custom_requests', label: 'Заявки' },
   { key: 'otp_codes', label: 'OTP-коды' },
@@ -95,14 +93,16 @@ export function AdminPage() {
   const perPage = 20
 
   const [search, setSearch] = useState('')
+  const [idSearch, setIdSearch] = useState('')
   const [serverStatus, setServerStatus] = useState('')
-  const [serverId, setServerId] = useState('')
+  const [selectedServerId, setSelectedServerId] = useState('')
   const [logLevel, setLogLevel] = useState('')
   const [customStatus, setCustomStatus] = useState('')
   const [otpEmail, setOtpEmail] = useState('')
 
   const [listData, setListData] = useState<ListData | null>(null)
   const [statsData, setStatsData] = useState<AdminServerStats | null>(null)
+  const [serverLogsData, setServerLogsData] = useState<ServerLogListResponse | null>(null)
 
   const totalPages = useMemo(() => {
     if (!listData) return 1
@@ -119,6 +119,14 @@ export function AdminPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadServerLogs = async (serverId: string, targetPage = 1) => {
+    await runRequest(async () => {
+      const data = await getAdminServerLogs(serverId.trim(), targetPage, perPage, logLevel || undefined)
+      setSelectedServerId(serverId)
+      setServerLogsData(data)
+    })
   }
 
   const loadData = async (targetPage = page) => {
@@ -140,10 +148,6 @@ export function AdminPage() {
         case 'servers':
           data = await listAdminServers(targetPage, perPage, serverStatus || undefined)
           break
-        case 'server_logs':
-          if (!serverId.trim()) throw new Error('Укажите server_id для просмотра логов')
-          data = await getAdminServerLogs(serverId.trim(), targetPage, perPage, logLevel || undefined)
-          break
         case 'agents':
           data = await listAdminAgents(targetPage, perPage)
           break
@@ -159,7 +163,18 @@ export function AdminPage() {
 
       setListData(data)
       setPage(data.page)
+
+      if (activeTab === 'servers' && selectedServerId.trim()) {
+        const logs = await getAdminServerLogs(selectedServerId.trim(), 1, perPage, logLevel || undefined)
+        setServerLogsData(logs)
+      }
     })
+  }
+
+  const filterRowsById = <T extends { id?: string | null }>(rows: T[]): T[] => {
+    const query = idSearch.trim().toLowerCase()
+    if (!query) return rows
+    return rows.filter((row) => (row.id || '').toLowerCase().includes(query))
   }
 
   const handleLogin = async (event: FormEvent) => {
@@ -175,6 +190,7 @@ export function AdminPage() {
     setIsAuthenticated(false)
     setListData(null)
     setStatsData(null)
+    setServerLogsData(null)
     setError(null)
   }
 
@@ -183,6 +199,8 @@ export function AdminPage() {
     setPage(1)
     setListData(null)
     setStatsData(null)
+    setServerLogsData(null)
+    void loadData(1)
   }, [activeTab, isAuthenticated])
 
   if (!isAuthenticated) {
@@ -247,8 +265,8 @@ export function AdminPage() {
           type="button"
           className="admin-id-link"
           onClick={() => {
-            setServerId(server.id || '')
-            setActiveTab('server_logs')
+            if (!server.id) return
+            void loadServerLogs(server.id, 1)
           }}
         >
           Логи
@@ -324,12 +342,20 @@ export function AdminPage() {
           )}
 
           {activeTab === 'servers' && (
-            <Input
-              label="Статус"
-              value={serverStatus}
-              onChange={(event) => setServerStatus(event.target.value)}
-              placeholder="active / error / provisioning"
-            />
+            <>
+              <Input
+                label="Статус"
+                value={serverStatus}
+                onChange={(event) => setServerStatus(event.target.value)}
+                placeholder="active / error / provisioning"
+              />
+              <Input
+                label="Уровень логов"
+                value={logLevel}
+                onChange={(event) => setLogLevel(event.target.value)}
+                placeholder="info / warning / error"
+              />
+            </>
           )}
 
           {activeTab === 'custom_requests' && (
@@ -350,27 +376,21 @@ export function AdminPage() {
             />
           )}
 
-          {activeTab === 'server_logs' && (
-            <>
-              <Input
-                label="Server ID"
-                value={serverId}
-                onChange={(event) => setServerId(event.target.value)}
-                placeholder="uuid"
-              />
-              <Input
-                label="Уровень"
-                value={logLevel}
-                onChange={(event) => setLogLevel(event.target.value)}
-                placeholder="info / warning / error"
-              />
-            </>
+          {activeTab !== 'servers_stats' && (
+            <Input
+              label="ID"
+              value={idSearch}
+              onChange={(event) => setIdSearch(event.target.value)}
+              placeholder="поиск по ID"
+            />
           )}
         </div>
 
-        <div className="admin-actions">
-          <Button onClick={() => loadData(1)} loading={loading}>Обновить</Button>
-        </div>
+        {activeTab !== 'servers_stats' && (
+          <div className="admin-actions">
+            <Button onClick={() => loadData(1)} loading={loading}>Поиск</Button>
+          </div>
+        )}
       </Card>
 
       {error && (
@@ -395,7 +415,7 @@ export function AdminPage() {
         <AdminTable
           title="Пользователи"
           columns={userColumns}
-          rows={listData.items as AdminUserListItem[]}
+          rows={filterRowsById(listData.items as AdminUserListItem[])}
           rowKey={(row) => row.id}
         />
       )}
@@ -404,17 +424,18 @@ export function AdminPage() {
         <AdminTable
           title="Серверы"
           columns={serverColumns}
-          rows={listData.items as AdminServerListItem[]}
+          rows={filterRowsById(listData.items as AdminServerListItem[])}
           rowKey={(row) => row.id}
         />
       )}
 
-      {activeTab === 'server_logs' && listData && (
+      {activeTab === 'servers' && serverLogsData && (
         <AdminTable
-          title="Логи сервера"
+          title={`Логи сервера: ${selectedServerId}`}
           columns={logColumns}
-          rows={listData.items as ServerLogItem[]}
+          rows={filterRowsById(serverLogsData.items as ServerLogItem[])}
           rowKey={(row) => row.id}
+          emptyText="Логи не найдены"
         />
       )}
 
@@ -422,7 +443,7 @@ export function AdminPage() {
         <AdminTable
           title="Агенты"
           columns={agentColumns}
-          rows={listData.items as AdminAgentListItem[]}
+          rows={filterRowsById(listData.items as AdminAgentListItem[])}
           rowKey={(row) => row.id}
         />
       )}
@@ -431,7 +452,7 @@ export function AdminPage() {
         <AdminTable
           title="Кастомные заявки"
           columns={requestColumns}
-          rows={listData.items as AdminCustomRequestItem[]}
+          rows={filterRowsById(listData.items as AdminCustomRequestItem[])}
           rowKey={(row) => row.id}
         />
       )}
@@ -440,7 +461,7 @@ export function AdminPage() {
         <AdminTable
           title="OTP-коды"
           columns={otpColumns}
-          rows={listData.items as AdminOTPCodeItem[]}
+          rows={filterRowsById(listData.items as AdminOTPCodeItem[])}
           rowKey={(row) => row.id}
         />
       )}
