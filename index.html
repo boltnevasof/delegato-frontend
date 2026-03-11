@@ -4,13 +4,230 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Delegato - AI-агенты для малого бизнеса</title>
-    <meta name="description" content="Delegato - managed-платформа для запуска персональных AI-агентов с Telegram, Slack, WhatsApp, скиллами и безопасностью из коробки.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <meta
+      name="description"
+      content="Delegato - managed-платформа для запуска персональных AI-агентов с Telegram, Slack, WhatsApp, скиллами и безопасностью из коробки."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/landing.css" />
   </head>
   <body>
-    <div id="root"></div>
+    <div class="lp">
+      <header class="lp-header">
+        <div class="lp-wrap lp-header-inner">
+          <a class="lp-logo" href="#home">Delegato</a>
+
+          <nav class="lp-nav" id="lpNav">
+            <a href="#jobs">Возможности</a>
+            <a href="#cases">Кейсы</a>
+            <a href="#pricing">Тарифы</a>
+            <a class="lp-btn lp-btn-main" href="/auth">Запустить</a>
+          </nav>
+
+          <button class="lp-burger" id="lpBurger" aria-label="Открыть меню">☰</button>
+        </div>
+      </header>
+
+      <main>
+        <section id="home" class="lp-wrap lp-hero">
+          <div class="lp-hero-left">
+            <h1>
+              Делегируйте рутину<br />
+              бизнеса с <span>персональным</span><br />
+              <span>AI-агентом</span>
+            </h1>
+
+            <a class="lp-about" href="/auth">
+              <span>▶</span>
+              О нашем сервисе
+            </a>
+
+            <p>
+              Delegato автоматизирует встречи, входящие<br />
+              сообщения, напоминания и рутину в Telegram
+              <img class="lp-inline-icon" src="/landing/icons/telegram.svg" alt="" aria-hidden="true" />,<br />
+              WhatsApp
+              <img class="lp-inline-icon" src="/landing/icons/whatsapp.svg" alt="" aria-hidden="true" />
+              и Slack
+              <img class="lp-inline-icon" src="/landing/icons/slack.svg" alt="" aria-hidden="true" /> - без терминала и сложной<br />
+              настройки.
+            </p>
+          </div>
+
+          <div class="lp-hero-right" aria-label="Демо область">
+            <img class="lp-hero-right-image" src="/hero.png" alt="Delegato hero visual" />
+          </div>
+        </section>
+
+        <section id="jobs" class="lp-wrap lp-section">
+          <p class="lp-kicker">Core Jobs</p>
+          <h2>
+            Что Delegato <span>делает</span><br />
+            <span>уже сейчас</span>
+          </h2>
+
+          <div class="lp-jobs-layout">
+            <div class="lp-jobs-left">
+              <article class="lp-card lp-job job-01">
+                <div class="lp-job-meta"><b>01</b><small>5-8 ч/нед</small></div>
+                <h3>Расписание и встречи</h3>
+                <p>Согласует встречи, создаёт/переносит события, отправляет напоминания и подтверждения.</p>
+              </article>
+
+              <article class="lp-card lp-job job-04">
+                <div class="lp-job-meta"><b>04</b><small>без пропусков</small></div>
+                <h3>Внешняя память</h3>
+                <p>Следит за дедлайнами, звонками, счетами и критичными задачами без ручного трекинга.</p>
+              </article>
+            </div>
+
+            <article class="lp-card lp-job job-02 blue">
+              <div class="lp-job-meta"><b>02</b><small>8-10 ч/нед</small></div>
+              <h3>Обработка входящих</h3>
+              <p>Сортирует поток, отвечает на типовые сообщения, эскалирует только важное.</p>
+            </article>
+
+            <div class="lp-jobs-right">
+              <article class="lp-card lp-job job-03">
+                <div class="lp-job-meta"><b>03</b><small>3-5 ч/нед</small></div>
+                <h3>Ресёрч и отчёты</h3>
+                <p>Ищет поставщиков, цены и конкурентов, отдаёт результат в чат, PDF или таблицу.</p>
+              </article>
+
+              <div class="lp-jobs-right-bottom">
+                <article class="lp-card lp-job job-05">
+                  <div class="lp-job-meta"><b>05</b><small>без пропусков</small></div>
+                  <h3>Ответы клиентам</h3>
+                  <p>FAQ-ответы, запись на услуги, напоминания и передача нестандарта владельцу.</p>
+                </article>
+
+                <article class="lp-card lp-job job-06 deep">
+                  <div class="lp-job-meta"><b>06</b><small>2-3 ч/нед</small></div>
+                  <h3>Метрики бизнеса</h3>
+                  <p>Собирает данные из CRM/Sheets, считает динамику и алертит об отклонениях.</p>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="cases" class="lp-wrap lp-section">
+          <p class="lp-kicker">Кейсы</p>
+          <h2>
+            Где бизнес уже <span>экономит</span><br />
+            <span>время и деньги</span>
+          </h2>
+
+          <div class="lp-cases-grid">
+            <article class="lp-card lp-case">
+              <h3>Салон красоты, Алматы</h3>
+              <div class="lp-case-tools">
+                <p class="lp-case-tools-label">Инструменты:</p>
+                <div class="lp-tags">
+                  <span>Автоответы в WhatsApp</span>
+                  <span>Напоминания о записи</span>
+                </div>
+              </div>
+              <div class="lp-case-result"><strong>-32%</strong><span>потерянных лидов за 6 недель</span></div>
+            </article>
+
+            <article class="lp-card lp-case">
+              <h3>Маркетинговое агентство, Минск</h3>
+              <div class="lp-case-tools">
+                <p class="lp-case-tools-label">Инструменты:</p>
+                <div class="lp-tags">
+                  <span>Сортировка входящих</span>
+                  <span>Утренний брифинг владельцу</span>
+                </div>
+              </div>
+              <div class="lp-case-result"><strong>+21</strong><span>ч/мес освобождённого времени</span></div>
+            </article>
+
+            <article class="lp-card lp-case">
+              <h3>Онлайн-школа, Москва</h3>
+              <div class="lp-case-tools">
+                <p class="lp-case-tools-label">Инструменты:</p>
+                <div class="lp-tags">
+                  <span>FAQ-ответы в Telegram</span>
+                  <span>Контроль оплат</span>
+                </div>
+              </div>
+              <div class="lp-case-result"><strong>+18%</strong><span>к оплатам за месяц</span></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="pricing" class="lp-wrap lp-section">
+          <p class="lp-kicker">Тарифы</p>
+          <h2>
+            Три уровня<br />
+            <span>внедрения Delegato</span>
+          </h2>
+
+          <div class="lp-pricing-grid">
+            <article class="lp-card lp-plan">
+              <h3>Start</h3>
+              <p class="lp-price">4 590 ₽/мес</p>
+              <ul>
+                <li>1 агент</li>
+                <li>Telegram + Calendar</li>
+                <li>Core jobs 1,2,4</li>
+                <li>Стандартные лимиты</li>
+              </ul>
+              <a class="lp-btn lp-btn-outline" href="/auth">Выбрать</a>
+            </article>
+
+            <article class="lp-card lp-plan featured">
+              <p class="lp-badge">Популярный</p>
+              <h3>Assistant</h3>
+              <p class="lp-price">9 990 ₽/мес</p>
+              <ul>
+                <li>До 3 агентов</li>
+                <li>Telegram + WA + Slack</li>
+                <li>Премиум-скиллы + Job 5</li>
+                <li>Приоритетная поддержка</li>
+              </ul>
+              <a class="lp-btn lp-btn-main" href="/auth">Запустить Assistant</a>
+            </article>
+
+            <article class="lp-card lp-plan">
+              <h3>Custom / On-Prem</h3>
+              <ul>
+                <li>OpenClaw on-prem</li>
+                <li>Интеграции с CRM/ERP</li>
+                <li>Усиленная безопасность</li>
+                <li>Enterprise сопровождение</li>
+              </ul>
+              <a class="lp-btn lp-btn-outline" href="/auth">Обсудить</a>
+            </article>
+          </div>
+        </section>
+
+        <section class="lp-wrap lp-cta" id="cta">
+          <div class="lp-cta-copy">
+            <h2>Запустим первого агента за 1 день</h2>
+            <p>Оставьте заявку — подготовим конфигурацию под ваш бизнес и каналы.</p>
+            <a class="lp-btn lp-btn-main" href="/auth">Запросить демо</a>
+          </div>
+          <div class="lp-cta-art" aria-hidden="true"></div>
+        </section>
+      </main>
+
+      <footer class="lp-wrap lp-footer">
+        <span>© 2026 Delegato</span>
+        <div>
+          <a href="#">Политика</a>
+          <a href="#">Контакты</a>
+        </div>
+      </footer>
+    </div>
+    <script type="module" src="/scripts/landing.js"></script>
+    <div id="app"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

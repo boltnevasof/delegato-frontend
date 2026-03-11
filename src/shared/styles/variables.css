@@ -4,11 +4,13 @@
   --color-danger: #e53e3e;
   --color-primary: #1f5eff;
   --color-primary-hover: #143db0;
+  --color-primary-light: #eff6ff;
   --color-text: #0a0d14;
   --color-text-secondary: #4f596b;
   --color-text-muted: #7b8494;
   --color-text-light: #7b8494;
   --color-bg: #f3f7ff;
+  --color-bg-alt: #f1f5f9;
   --color-bg-white: #fff;
   --color-border: #d9e3ff;
   --color-border-light: #e8eeff;
@@ -30,4 +32,7 @@
 
   --sidebar-width: 240px;
   --header-height: 57px;
+
+  /* Типографика */
+  --font-base: 'Inter', system-ui, sans-serif;
 }

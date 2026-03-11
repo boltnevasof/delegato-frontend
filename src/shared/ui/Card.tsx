@@ -1,27 +1,11 @@
-import type { ReactNode } from 'react'
+import type { HTMLAttributes } from 'react'
 
-type CardProps = {
-  header?: ReactNode
-  footer?: ReactNode
-  selected?: boolean
-  disabled?: boolean
-  className?: string
-  children: ReactNode
-}
+type CardProps = HTMLAttributes<HTMLDivElement>
 
-export function Card({ header, footer, selected, disabled, className = '', children }: CardProps) {
-  const classes = [
-    'card',
-    selected && 'card--selected',
-    disabled && 'card--disabled',
-    className,
-  ].filter(Boolean).join(' ')
-
+export function Card({ children, className = '', ...props }: CardProps) {
   return (
-    <div className={classes}>
-      {header && <div className="mb-16">{header}</div>}
+    <div className={`card ${className}`} {...props}>
       {children}
-      {footer && <div className="mt-16">{footer}</div>}
     </div>
   )
 }
