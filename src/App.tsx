@@ -9,8 +9,10 @@ import { ChannelPage } from './features/channels/ChannelPage'
 import { SubscriptionPage } from './features/billing/SubscriptionPage'
 import { SupportPage } from './features/support/SupportPage'
 import { AdminPage } from './features/admin/AdminPage'
+import { AdminUserDetailPage } from './features/admin/AdminUserDetailPage'
 import { AuthPage } from './features/auth/AuthPage'
 import { GoogleCallback } from './features/auth/GoogleCallback'
+import { NewOnboardingPage } from './features/onboarding/NewOnboardingPage'
 
 function ProtectedRoute() {
   const { isAuthenticated } = useAuth()
@@ -36,8 +38,9 @@ export function App() {
           <Route path="/auth/callback/google" element={<GoogleCallback />} />
         </Route>
 
-        {/* Дашборд — только для авторизованных */}
+        {/* Дашборд + онбординг — только для авторизованных */}
         <Route element={<ProtectedRoute />}>
+          <Route path="/onboarding" element={<NewOnboardingPage />} />
           <Route element={<DashboardLayout />}>
             <Route path="/agent/settings" element={<AgentSettingsPage />} />
             <Route path="/agent/skills"   element={<SkillsPage />} />
@@ -50,6 +53,7 @@ export function App() {
 
         {/* Админка */}
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/users/:userId" element={<AdminUserDetailPage />} />
 
         {/* Лендинг — React ничего не рендерит */}
         <Route path="/" element={null} />

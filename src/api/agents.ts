@@ -103,6 +103,40 @@ export function getTaskStatus(taskId: string): Promise<AsyncTaskStatusResponse> 
   return apiRequest<AsyncTaskStatusResponse>(`/agents/tasks/${taskId}/status`)
 }
 
+// ── Пошаговый onboarding ─────────────────────────────────────────────────────
+
+export type OnboardingAnswerEntry = { question_id: string; answer: string | null }
+
+export type OnboardingStateResponse = {
+  current_step: number
+  is_completed: boolean
+  answers: OnboardingAnswerEntry[]
+}
+
+export function getOnboardingState(): Promise<OnboardingStateResponse> {
+  return apiRequest<OnboardingStateResponse>('/agents/onboarding/state')
+}
+
+export function saveOnboardingAnswer(questionId: string, answer: string | null): Promise<{ status: string }> {
+  return apiRequest<{ status: string }>('/agents/onboarding/answer', {
+    method: 'POST',
+    body: JSON.stringify({ question_id: questionId, answer }),
+  })
+}
+
+export function updateOnboardingStep(step: number): Promise<{ status: string }> {
+  return apiRequest<{ status: string }>('/agents/onboarding/step', {
+    method: 'POST',
+    body: JSON.stringify({ step }),
+  })
+}
+
+export function finishOnboarding(): Promise<AsyncTaskAcceptedResponse> {
+  return apiRequest<AsyncTaskAcceptedResponse>('/agents/onboarding/finish', {
+    method: 'POST',
+  })
+}
+
 // ── Настройки агента (about) ──────────────────────────────────────────────────
 
 export function getAgentAbout(): Promise<AgentAboutResponse> {

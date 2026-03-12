@@ -34,6 +34,7 @@ const navItems = [
   {
     to: '/agent/skills',
     label: 'Задачи и скиллы',
+    hidden: true,
     icon: (
       <Icon>
         <path d="M13 3v7h6l-8 11v-7H5l8-11Z" />
@@ -43,6 +44,7 @@ const navItems = [
   {
     to: '/agent/tools',
     label: 'Инструменты',
+    hidden: true,
     icon: (
       <Icon>
         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z" />
@@ -97,7 +99,7 @@ export function DashboardLayout() {
       <div className="layout-sidebar">
         <nav className="sidebar">
           <ul className="sidebar-list">
-            {navItems.map((item) => (
+            {navItems.filter((item) => !item.hidden).map((item) => (
               <li key={item.to}>
                 <NavLink
                   to={item.to}

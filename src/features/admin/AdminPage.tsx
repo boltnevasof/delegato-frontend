@@ -5,6 +5,8 @@ import type { components } from '../../api/generated/schema'
 import {
   adminLogin,
   clearAdminAccessToken,
+  createAdminTariff,
+  deleteAdminTariff,
   getAdminAccessToken,
   getAdminServerLogs,
   getAdminServerStats,
@@ -12,7 +14,14 @@ import {
   listAdminCustomRequests,
   listAdminOtpCodes,
   listAdminServers,
+  listAdminTariffs,
   listAdminUsers,
+  updateAdminTariff,
+} from '../../api/admin'
+import type {
+  AdminTariffListItem,
+  AdminTariffListResponse,
+  AdminCreateTariffRequest,
 } from '../../api/admin'
 import { Button, Card, ErrorBanner, Input } from '../../shared/ui'
 import { AdminTable, type AdminTableColumn } from './components/AdminTable'
@@ -24,6 +33,7 @@ type TabKey =
   | 'agents'
   | 'custom_requests'
   | 'otp_codes'
+  | 'tariffs'
 
 type AdminUserListItem = components['schemas']['AdminUserListItem']
 type AdminUserListResponse = components['schemas']['AdminUserListResponse']
@@ -46,6 +56,7 @@ type ListData =
   | AdminAgentListResponse
   | AdminCustomRequestListResponse
   | AdminOTPCodeListResponse
+  | AdminTariffListResponse
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'users', label: 'Пользователи' },
@@ -54,6 +65,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'agents', label: 'Агенты' },
   { key: 'custom_requests', label: 'Заявки' },
   { key: 'otp_codes', label: 'OTP-коды' },
+  { key: 'tariffs', label: 'Тарифы' },
 ]
 
 function formatDate(value?: string): string {
@@ -77,6 +89,17 @@ function isPaginatedResponse(data: unknown): data is ListData {
     'page' in data &&
     'per_page' in data,
   )
+}
+
+const EMPTY_TARIFF_FORM: AdminCreateTariffRequest = {
+  slug: '',
+  name: '',
+  price_rub: 0,
+  max_channels: null,
+  llm_model: null,
+  skills_access: 'basic',
+  is_self_service: true,
+  is_active: true,
 }
 
 export function AdminPage() {
@@ -103,6 +126,11 @@ export function AdminPage() {
   const [listData, setListData] = useState<ListData | null>(null)
   const [statsData, setStatsData] = useState<AdminServerStats | null>(null)
   const [serverLogsData, setServerLogsData] = useState<ServerLogListResponse | null>(null)
+
+  // Tariff form state
+  const [tariffForm, setTariffForm] = useState<AdminCreateTariffRequest>({ ...EMPTY_TARIFF_FORM })
+  const [editingTariffId, setEditingTariffId] = useState<string | null>(null)
+  const [showTariffForm, setShowTariffForm] = useState(false)
 
   const totalPages = useMemo(() => {
     if (!listData) return 1
@@ -157,6 +185,9 @@ export function AdminPage() {
         case 'otp_codes':
           data = await listAdminOtpCodes(targetPage, perPage, otpEmail || undefined)
           break
+        case 'tariffs':
+          data = await listAdminTariffs(targetPage, perPage)
+          break
         default:
           data = await listAdminUsers(targetPage, perPage, search || undefined)
       }
@@ -194,12 +225,57 @@ export function AdminPage() {
     setError(null)
   }
 
+  // --- Tariff CRUD handlers ---
+
+  const openCreateTariff = () => {
+    setTariffForm({ ...EMPTY_TARIFF_FORM })
+    setEditingTariffId(null)
+    setShowTariffForm(true)
+  }
+
+  const openEditTariff = (tariff: AdminTariffListItem) => {
+    setTariffForm({
+      slug: tariff.slug,
+      name: tariff.name,
+      price_rub: tariff.price_rub,
+      max_channels: tariff.max_channels,
+      llm_model: tariff.llm_model,
+      skills_access: tariff.skills_access,
+      is_self_service: tariff.is_self_service,
+      is_active: tariff.is_active,
+    })
+    setEditingTariffId(tariff.id)
+    setShowTariffForm(true)
+  }
+
+  const handleSaveTariff = async (event: FormEvent) => {
+    event.preventDefault()
+    await runRequest(async () => {
+      if (editingTariffId) {
+        await updateAdminTariff(editingTariffId, tariffForm)
+      } else {
+        await createAdminTariff(tariffForm)
+      }
+      setShowTariffForm(false)
+      setEditingTariffId(null)
+      await loadData(1)
+    })
+  }
+
+  const handleDeleteTariff = async (tariffId: string) => {
+    await runRequest(async () => {
+      await deleteAdminTariff(tariffId)
+      await loadData(1)
+    })
+  }
+
   useEffect(() => {
     if (!isAuthenticated) return
     setPage(1)
     setListData(null)
     setStatsData(null)
     setServerLogsData(null)
+    setShowTariffForm(false)
     void loadData(1)
   }, [activeTab, isAuthenticated])
 
@@ -308,6 +384,36 @@ export function AdminPage() {
     { key: 'created', header: 'Создан', render: (otp) => formatDate(otp.created_at) },
   ]
 
+  const tariffColumns: AdminTableColumn<AdminTariffListItem>[] = [
+    { key: 'id', header: 'ID', render: (t) => shortId(t.id) },
+    { key: 'slug', header: 'Slug', render: (t) => t.slug },
+    { key: 'name', header: 'Название', render: (t) => t.name },
+    { key: 'price', header: 'Цена (коп.)', render: (t) => t.price_rub },
+    { key: 'channels', header: 'Каналы', render: (t) => t.max_channels ?? '—' },
+    { key: 'llm', header: 'LLM', render: (t) => t.llm_model || '—' },
+    { key: 'skills', header: 'Навыки', render: (t) => t.skills_access },
+    { key: 'active', header: 'Активен', render: (t) => (t.is_active ? 'Да' : 'Нет') },
+    {
+      key: 'actions',
+      header: '',
+      render: (t) => (
+        <span style={{ display: 'flex', gap: 8 }}>
+          <button type="button" className="admin-id-link" onClick={() => openEditTariff(t)}>
+            Изм.
+          </button>
+          <button
+            type="button"
+            className="admin-id-link"
+            style={{ color: '#c0392b' }}
+            onClick={() => { if (confirm('Удалить тариф?')) void handleDeleteTariff(t.id) }}
+          >
+            Удал.
+          </button>
+        </span>
+      ),
+    },
+  ]
+
   return (
     <div className="admin-page">
       <div className="admin-head">
@@ -376,7 +482,7 @@ export function AdminPage() {
             />
           )}
 
-          {activeTab !== 'servers_stats' && (
+          {activeTab !== 'servers_stats' && activeTab !== 'tariffs' && (
             <Input
               label="ID"
               value={idSearch}
@@ -386,9 +492,16 @@ export function AdminPage() {
           )}
         </div>
 
-        {activeTab !== 'servers_stats' && (
+        {activeTab !== 'servers_stats' && activeTab !== 'tariffs' && (
           <div className="admin-actions">
             <Button onClick={() => loadData(1)} loading={loading}>Поиск</Button>
+          </div>
+        )}
+
+        {activeTab === 'tariffs' && (
+          <div className="admin-actions">
+            <Button onClick={() => loadData(1)} loading={loading}>Обновить</Button>
+            <Button variant="primary" onClick={openCreateTariff}>Создать тариф</Button>
           </div>
         )}
       </Card>
@@ -464,6 +577,99 @@ export function AdminPage() {
           rows={filterRowsById(listData.items as AdminOTPCodeItem[])}
           rowKey={(row) => row.id}
         />
+      )}
+
+      {activeTab === 'tariffs' && listData && (
+        <AdminTable
+          title="Тарифы"
+          columns={tariffColumns}
+          rows={(listData.items as AdminTariffListItem[])}
+          rowKey={(row) => row.id}
+        />
+      )}
+
+      {activeTab === 'tariffs' && showTariffForm && (
+        <Card className="mt-16">
+          <h2 className="admin-section-title">
+            {editingTariffId ? 'Редактирование тарифа' : 'Новый тариф'}
+          </h2>
+          <form className="admin-user-form" onSubmit={handleSaveTariff}>
+            <Input
+              label="Slug"
+              value={tariffForm.slug}
+              onChange={(e) => setTariffForm((prev) => ({ ...prev, slug: e.target.value }))}
+            />
+            <Input
+              label="Название"
+              value={tariffForm.name}
+              onChange={(e) => setTariffForm((prev) => ({ ...prev, name: e.target.value }))}
+            />
+            <Input
+              label="Цена (копейки)"
+              type="number"
+              value={String(tariffForm.price_rub)}
+              onChange={(e) => setTariffForm((prev) => ({ ...prev, price_rub: Number(e.target.value) }))}
+            />
+            <Input
+              label="Макс. каналов (пусто = без лимита)"
+              value={tariffForm.max_channels != null ? String(tariffForm.max_channels) : ''}
+              onChange={(e) => setTariffForm((prev) => ({
+                ...prev,
+                max_channels: e.target.value ? Number(e.target.value) : null,
+              }))}
+            />
+            <Input
+              label="LLM модель"
+              value={tariffForm.llm_model || ''}
+              onChange={(e) => setTariffForm((prev) => ({
+                ...prev,
+                llm_model: e.target.value || null,
+              }))}
+            />
+            <div>
+              <label className="form-label">Доступ к навыкам</label>
+              <select
+                className="form-input"
+                value={tariffForm.skills_access}
+                onChange={(e) => setTariffForm((prev) => ({ ...prev, skills_access: e.target.value }))}
+              >
+                <option value="basic">basic</option>
+                <option value="all">all</option>
+              </select>
+            </div>
+            <div>
+              <label className="form-label">Self-service</label>
+              <select
+                className="form-input"
+                value={String(tariffForm.is_self_service)}
+                onChange={(e) => setTariffForm((prev) => ({ ...prev, is_self_service: e.target.value === 'true' }))}
+              >
+                <option value="true">Да</option>
+                <option value="false">Нет</option>
+              </select>
+            </div>
+            <div>
+              <label className="form-label">Активен</label>
+              <select
+                className="form-input"
+                value={String(tariffForm.is_active)}
+                onChange={(e) => setTariffForm((prev) => ({ ...prev, is_active: e.target.value === 'true' }))}
+              >
+                <option value="true">Да</option>
+                <option value="false">Нет</option>
+              </select>
+            </div>
+            <div className="admin-actions">
+              <Button type="submit" loading={loading}>Сохранить</Button>
+              <Button
+                variant="secondary"
+                onClick={() => { setShowTariffForm(false); setEditingTariffId(null) }}
+              >
+                Отмена
+              </Button>
+            </div>
+          </form>
+        </Card>
       )}
 
       {isPaginatedResponse(listData) && activeTab !== 'servers_stats' && (

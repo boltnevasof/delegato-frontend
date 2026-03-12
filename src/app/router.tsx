@@ -24,7 +24,9 @@ const lazyChan = () => import('../features/channels/ChannelPage').then(m => ({ C
 const lazySub = () => import('../features/billing/SubscriptionPage').then(m => ({ Component: m.SubscriptionPage }))
 const lazySup = () => import('../features/support/SupportPage').then(m => ({ Component: m.SupportPage }))
 const lazyAdmin = () => import('../features/admin/AdminPage').then(m => ({ Component: m.AdminPage }))
+const lazyAdminUser = () => import('../features/admin/AdminUserDetailPage').then(m => ({ Component: m.AdminUserDetailPage }))
 const lazyLanding = () => import('../features/landing/LandingPage').then(m => ({ Component: m.LandingPage }))
+const lazyNewOnboarding = () => import('../features/onboarding/NewOnboardingPage').then(m => ({ Component: m.NewOnboardingPage }))
 
 export const router = createBrowserRouter([
   {
@@ -46,8 +48,8 @@ export const router = createBrowserRouter([
         element: <DashboardLayout />,
         children: [
           { path: '/agent/settings', lazy: lazyAgentSettings },
-          { path: '/agent/skills', lazy: lazySkills },
-          { path: '/agent/tools', lazy: lazyTools },
+          { path: '/agent/skills', element: <Navigate to="/agent/settings" replace /> },
+          { path: '/agent/tools', element: <Navigate to="/agent/settings" replace /> },
           { path: '/agent/channel', lazy: lazyChan },
           { path: '/billing', lazy: lazySub },
           { path: '/support', lazy: lazySup },
@@ -55,7 +57,20 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  { path: '/admin', lazy: lazyAdmin },
+  {
+    element: <ProtectedRoute />,
+    children: [
+      { path: '/onboarding', lazy: lazyNewOnboarding },
+    ],
+  },
+  {
+    path: '/admin',
+    element: <Outlet />,
+    children: [
+      { index: true, lazy: lazyAdmin },
+      { path: 'users/:userId', lazy: lazyAdminUser },
+    ],
+  },
   { path: '/', lazy: lazyLanding },
   { path: '*', element: <Navigate to="/" replace /> },
 ])

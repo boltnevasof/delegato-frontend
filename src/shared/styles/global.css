@@ -684,9 +684,10 @@ textarea.form-input {
 
 /* Onboarding */
 .onboarding-wrap {
-  max-width: 640px;
+  max-width: 720px;
+  width: 100%;
   margin: 0 auto;
-  padding: 40px;
+  padding: 48px 40px;
 }
 .onboarding-nav {
   display: flex;
@@ -695,6 +696,95 @@ textarea.form-input {
   margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid var(--color-border-lighter);
+}
+
+/* Onboarding Progress (circles) */
+.onboarding-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 32px;
+}
+.onboarding-progress-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: var(--color-white);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.onboarding-progress-dot--completed {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+}
+.onboarding-progress-dot--active {
+  width: 18px;
+  height: 18px;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-light);
+}
+.onboarding-progress-line {
+  width: 40px;
+  height: 2px;
+  background: var(--color-border);
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+.onboarding-progress-line--active {
+  background: var(--color-primary);
+}
+
+/* Onboarding Step Content */
+.onboarding-step-content {
+  text-align: left;
+}
+.onboarding-intro {
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+.onboarding-intro h2 {
+  font-size: 28px;
+  margin-bottom: 16px;
+}
+.onboarding-intro .onboarding-step-hint {
+  font-size: 16px;
+  margin-bottom: 40px;
+}
+.onboarding-step-content h2 {
+  margin-bottom: 8px;
+}
+.onboarding-step-hint {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.onboarding-step-content .form-input {
+  width: 100%;
+  margin-bottom: 0;
+  padding: 14px 16px;
+  font-size: 16px;
+}
+.onboarding-step-content textarea.form-input {
+  min-height: 160px;
+}
+.onboarding-step-content .onboarding-input-name {
+  font-size: 18px;
+  padding: 18px 20px;
+}
+.onboarding-step-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+}
+.onboarding-step-actions .btn {
+  padding: 12px 32px;
+  font-size: 16px;
 }
 
 /* Error Banner */
@@ -1897,6 +1987,9 @@ textarea.form-input {
 .admin-page {
   max-width: 1320px;
   margin: 0 auto;
+  padding: 24px 16px;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .admin-head {
@@ -1987,6 +2080,10 @@ textarea.form-input {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 16px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
 }
 
 .admin-table {
