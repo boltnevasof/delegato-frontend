@@ -2,7 +2,26 @@ import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../shared/hooks/useAuth'
 import { getMe } from '../../api/users'
+import { getOnboardingState } from '../../api/agents'
 import { Spinner } from '../../shared/ui'
+
+async function resolvePostLoginRoute(): Promise<string> {
+  try {
+    const user = await getMe()
+    if (!user.subscription) return '/billing'
+
+    try {
+      const state = await getOnboardingState()
+      if (!state.is_completed) return '/onboarding'
+    } catch {
+      // Если ошибка при загрузке onboarding state — пропускаем
+    }
+
+    return '/agent/settings'
+  } catch {
+    return '/billing'
+  }
+}
 
 export function GoogleCallback() {
   const { login } = useAuth()
@@ -27,19 +46,9 @@ export function GoogleCallback() {
 
     login(accessToken, refreshToken)
 
-    getMe()
-      .then((user) => {
-        if (!user.subscription) {
-          navigate('/pricing', { replace: true })
-        } else if (user.agent && user.agent.onboarding_step > 0 && user.agent.onboarding_step <= 5) {
-          navigate(`/onboarding/${user.agent.onboarding_step}`, { replace: true })
-        } else {
-          navigate('/dashboard', { replace: true })
-        }
-      })
-      .catch(() => {
-        navigate('/dashboard', { replace: true })
-      })
+    resolvePostLoginRoute()
+      .then((route) => navigate(route, { replace: true }))
+      .catch(() => navigate('/billing', { replace: true }))
   }, [login, navigate])
 
   return (

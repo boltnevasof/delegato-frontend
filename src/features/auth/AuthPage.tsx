@@ -4,8 +4,28 @@ import { useForm } from 'react-hook-form'
 import { useAuth } from '../../shared/hooks/useAuth'
 import { useApiError } from '../../shared/hooks/useApiError'
 import { sendOtp, verifyOtp, googleInitiateUrl } from '../../api/auth'
+import { getMe } from '../../api/users'
+import { getOnboardingState } from '../../api/agents'
 
 import { Button, ErrorBanner } from '../../shared/ui'
+
+async function resolvePostLoginRoute(): Promise<string> {
+  try {
+    const user = await getMe()
+    if (!user.subscription) return '/billing'
+
+    try {
+      const state = await getOnboardingState()
+      if (!state.is_completed) return '/onboarding'
+    } catch {
+      // Если ошибка при загрузке onboarding state — пропускаем
+    }
+
+    return '/agent/settings'
+  } catch {
+    return '/billing'
+  }
+}
 
 type Step = 'methods' | 'code' | 'success'
 
@@ -42,7 +62,8 @@ export function AuthPage() {
       login(tokens.access_token, tokens.refresh_token)
       setStep('success')
 
-      navigate('/agent/settings', { replace: true })
+      const route = await resolvePostLoginRoute()
+      navigate(route, { replace: true })
     } catch (err) {
       setError(err)
     } finally {

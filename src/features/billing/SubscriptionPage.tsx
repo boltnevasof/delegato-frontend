@@ -2,10 +2,9 @@ import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getCurrent, changeTariff, reactivate } from '../../api/subscriptions'
 import { getTariffs } from '../../api/tariffs'
-import { getHistory } from '../../api/payments'
+import { getHistory, subscribe } from '../../api/payments'
 import { useApiError } from '../../shared/hooks/useApiError'
 import { Button, Badge, ErrorBanner, Spinner } from '../../shared/ui'
-import { DashboardEmpty } from '../dashboard/DashboardEmpty'
 import { CancelModal } from './CancelModal'
 
 function formatPrice(kopecks: number): string {
@@ -24,6 +23,7 @@ export function SubscriptionPage() {
   const [changingTariffId, setChangingTariffId] = useState<string | null>(null)
   const [reactivating, setReactivating] = useState(false)
   const [prorationMessage, setProrationMessage] = useState<string | null>(null)
+  const [subscribingTariffId, setSubscribingTariffId] = useState<string | null>(null)
 
   const subQuery = useQuery({ queryKey: ['subscription'], queryFn: getCurrent })
   const tariffsQuery = useQuery({ queryKey: ['tariffs'], queryFn: getTariffs })
@@ -32,6 +32,24 @@ export function SubscriptionPage() {
   const sub = subQuery.data
   const tariffs = tariffsQuery.data?.tariffs ?? []
   const payments = historyQuery.data?.items ?? []
+
+  async function handleSubscribe(tariffId: string) {
+    clearError()
+    setSubscribingTariffId(tariffId)
+    try {
+      const result = await subscribe(tariffId)
+      if (result.payment_url) {
+        window.location.href = result.payment_url
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['subscription'] })
+        queryClient.invalidateQueries({ queryKey: ['userProfile'] })
+      }
+    } catch (err) {
+      setError(err)
+    } finally {
+      setSubscribingTariffId(null)
+    }
+  }
 
   async function handleChangeTariff(tariffId: string) {
     clearError()
@@ -77,10 +95,9 @@ export function SubscriptionPage() {
     )
   }
 
-  if (subQuery.error || tariffsQuery.error) {
-    if ((subQuery.error as { status?: number })?.status === 404) {
-      return <DashboardEmpty />
-    }
+  const noSubscription = (subQuery.error as { status?: number })?.status === 404
+
+  if ((subQuery.error && !noSubscription) || tariffsQuery.error) {
     const msg = (subQuery.error as { message?: string })?.message
       ?? (tariffsQuery.error as { message?: string })?.message
       ?? 'Не удалось загрузить данные подписки'
@@ -96,7 +113,12 @@ export function SubscriptionPage() {
 
   return (
     <div className="subscription-page">
-      <h1>Подписка</h1>
+      <h1>{noSubscription ? 'Выберите тариф' : 'Подписка'}</h1>
+      {noSubscription && (
+        <p className="text-muted" style={{ marginBottom: 24 }}>
+          Для начала работы с Delegato выберите подходящий тарифный план.
+        </p>
+      )}
 
       {error && <ErrorBanner message={error.message} />}
       {prorationMessage && <div className="success-banner">{prorationMessage}</div>}
@@ -164,45 +186,60 @@ export function SubscriptionPage() {
                 <li>Скиллы: {tariff.skills_access}</li>
               </ul>
 
-              {!isCurrent && !isCancelled && (
+              {noSubscription ? (
                 <Button
                   style={{ width: '100%' }}
-                  loading={changingTariffId === tariff.id}
-                  disabled={changingTariffId !== null}
-                  onClick={() => handleChangeTariff(tariff.id)}
+                  loading={subscribingTariffId === tariff.id}
+                  disabled={subscribingTariffId !== null}
+                  onClick={() => handleSubscribe(tariff.id)}
                 >
-                  Перейти на план
+                  Выбрать план
                 </Button>
+              ) : (
+                !isCurrent && !isCancelled && (
+                  <Button
+                    style={{ width: '100%' }}
+                    loading={changingTariffId === tariff.id}
+                    disabled={changingTariffId !== null}
+                    onClick={() => handleChangeTariff(tariff.id)}
+                  >
+                    Перейти на план
+                  </Button>
+                )
               )}
             </div>
           )
         })}
       </div>
 
-      <h2 className="mt-32">История платежей</h2>
-      {historyQuery.isLoading ? (
-        <Spinner />
-      ) : payments.length === 0 ? (
-        <p className="text-muted">Платежей пока нет</p>
-      ) : (
-        <table className="payment-table">
-          <thead>
-            <tr>
-              <th>Дата</th>
-              <th className="text-right">Сумма</th>
-              <th>Статус</th>
-            </tr>
-          </thead>
-          <tbody>
-            {payments.map((p) => (
-              <tr key={p.id}>
-                <td>{formatDate(p.created_at)}</td>
-                <td className="text-right">{formatPrice(p.amount_rub)}</td>
-                <td><Badge>{p.status}</Badge></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {!noSubscription && (
+        <>
+          <h2 className="mt-32">История платежей</h2>
+          {historyQuery.isLoading ? (
+            <Spinner />
+          ) : payments.length === 0 ? (
+            <p className="text-muted">Платежей пока нет</p>
+          ) : (
+            <table className="payment-table">
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th className="text-right">Сумма</th>
+                  <th>Статус</th>
+                </tr>
+              </thead>
+              <tbody>
+                {payments.map((p) => (
+                  <tr key={p.id}>
+                    <td>{formatDate(p.created_at)}</td>
+                    <td className="text-right">{formatPrice(p.amount_rub)}</td>
+                    <td><Badge>{p.status}</Badge></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </>
       )}
 
       <CancelModal

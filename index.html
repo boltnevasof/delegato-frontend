@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Delegato - AI-агенты для малого бизнеса</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta
       name="description"
       content="Delegato - managed-платформа для запуска персональных AI-агентов с Telegram, Slack, WhatsApp, скиллами и безопасностью из коробки."
@@ -29,7 +30,9 @@
             <a class="lp-btn lp-btn-main" href="/auth">Запустить</a>
           </nav>
 
-          <button class="lp-burger" id="lpBurger" aria-label="Открыть меню">☰</button>
+          <button class="lp-burger" id="lpBurger" aria-label="Открыть меню">
+            <span></span><span></span><span></span>
+          </button>
         </div>
       </header>
 
@@ -42,21 +45,16 @@
               <span>AI-агентом</span>
             </h1>
 
+            <p>
+              Почта, календарь, документы, контент, парсинг —<br />
+              агент забирает рутину на себя. Вы управляете<br />
+              бизнесом, а не задачами.
+            </p>
+
             <a class="lp-about" href="/auth">
               <span>▶</span>
               О нашем сервисе
             </a>
-
-            <p>
-              Delegato автоматизирует встречи, входящие<br />
-              сообщения, напоминания и рутину в Telegram
-              <img class="lp-inline-icon" src="/landing/icons/telegram.svg" alt="" aria-hidden="true" />,<br />
-              WhatsApp
-              <img class="lp-inline-icon" src="/landing/icons/whatsapp.svg" alt="" aria-hidden="true" />
-              и Slack
-              <img class="lp-inline-icon" src="/landing/icons/slack.svg" alt="" aria-hidden="true" /> - без терминала и сложной<br />
-              настройки.
-            </p>
           </div>
 
           <div class="lp-hero-right" aria-label="Демо область">
@@ -74,42 +72,42 @@
           <div class="lp-jobs-layout">
             <div class="lp-jobs-left">
               <article class="lp-card lp-job job-01">
-                <div class="lp-job-meta"><b>01</b><small>5-8 ч/нед</small></div>
-                <h3>Расписание и встречи</h3>
-                <p>Согласует встречи, создаёт/переносит события, отправляет напоминания и подтверждения.</p>
+                <div class="lp-job-meta"><b>01</b><small>каждый день</small></div>
+                <h3>Утренний и вечерний дайджест</h3>
+                <p>Утром — события из календаря, срочные письма, саммари непрочитанных сообщений в Telegram. Вечером — что сделано, что осталось, завтрашние встречи и дедлайны.</p>
               </article>
 
               <article class="lp-card lp-job job-04">
-                <div class="lp-job-meta"><b>04</b><small>без пропусков</small></div>
-                <h3>Внешняя память</h3>
-                <p>Следит за дедлайнами, звонками, счетами и критичными задачами без ручного трекинга.</p>
+                <div class="lp-job-meta"><b>04</b><small>hands-free</small></div>
+                <h3>Работа с голосом</h3>
+                <p>Распознаёт голосовые сообщения и выполняет задачи на их основе — как если бы вы написали текстом.</p>
               </article>
             </div>
 
             <article class="lp-card lp-job job-02 blue">
-              <div class="lp-job-meta"><b>02</b><small>8-10 ч/нед</small></div>
-              <h3>Обработка входящих</h3>
-              <p>Сортирует поток, отвечает на типовые сообщения, эскалирует только важное.</p>
+              <div class="lp-job-meta"><b>02</b><small>всё в одном</small></div>
+              <h3>Google Workspace</h3>
+              <p>Почта, календарь, документы, таблицы, диск — в одном агенте. Разбирает и категоризирует письма, создаёт встречи, формирует отчёты в Sheets и Docs прямо в вашем облаке.</p>
             </article>
 
             <div class="lp-jobs-right">
               <article class="lp-card lp-job job-03">
-                <div class="lp-job-meta"><b>03</b><small>3-5 ч/нед</small></div>
-                <h3>Ресёрч и отчёты</h3>
-                <p>Ищет поставщиков, цены и конкурентов, отдаёт результат в чат, PDF или таблицу.</p>
+                <div class="lp-job-meta"><b>03</b><small>автопилот</small></div>
+                <h3>Контент и соцсети</h3>
+                <p>Пишет и публикует посты в соцсети и Telegram-каналы по расписанию или по запросу. Ресёрчит тему, адаптирует тон под площадку.</p>
               </article>
 
               <div class="lp-jobs-right-bottom">
                 <article class="lp-card lp-job job-05">
-                  <div class="lp-job-meta"><b>05</b><small>без пропусков</small></div>
-                  <h3>Ответы клиентам</h3>
-                  <p>FAQ-ответы, запись на услуги, напоминания и передача нестандарта владельцу.</p>
+                  <div class="lp-job-meta"><b>05</b><small>без парсеров</small></div>
+                  <h3>Работа с браузером</h3>
+                  <p>Заполняет формы, собирает данные с сайтов, мониторит конкурентов. Что раньше требовало сложных парсеров — теперь делает ИИ-агент.</p>
                 </article>
 
                 <article class="lp-card lp-job job-06 deep">
-                  <div class="lp-job-meta"><b>06</b><small>2-3 ч/нед</small></div>
-                  <h3>Метрики бизнеса</h3>
-                  <p>Собирает данные из CRM/Sheets, считает динамику и алертит об отклонениях.</p>
+                  <div class="lp-job-meta"><b>06</b><small>как ChatGPT</small></div>
+                  <h3>Умный ассистент</h3>
+                  <p>Генерация текстов, анализ документов, расчёты, переводы, мозговой штурм — всё, для чего предприниматели используют ChatGPT, но прямо в вашем рабочем чате.</p>
                 </article>
               </div>
             </div>
@@ -124,42 +122,93 @@
           </h2>
 
           <div class="lp-cases-grid">
-            <article class="lp-card lp-case">
-              <h3>Салон красоты, Алматы</h3>
-              <div class="lp-case-tools">
-                <p class="lp-case-tools-label">Инструменты:</p>
-                <div class="lp-tags">
-                  <span>Автоответы в WhatsApp</span>
-                  <span>Напоминания о записи</span>
-                </div>
-              </div>
-              <div class="lp-case-result"><strong>-32%</strong><span>потерянных лидов за 6 недель</span></div>
+            <article class="lp-card lp-case" data-modal="case-1">
+              <h3>Фитнес-клуб, Казань</h3>
+              <p class="lp-case-desc">Записывает клиентов через чат-бота, рассылает напоминания за день и за час, отвечает на вопросы о ценах и расписании, собирает обратную связь. Каждое утро — сводка администратору: кто записан, кто отменил, какие слоты свободны.</p>
+              <div class="lp-case-result"><strong>-32%</strong><span>потерянных записей</span></div>
+              <button class="lp-case-more">Подробнее</button>
             </article>
 
-            <article class="lp-card lp-case">
-              <h3>Маркетинговое агентство, Минск</h3>
-              <div class="lp-case-tools">
-                <p class="lp-case-tools-label">Инструменты:</p>
-                <div class="lp-tags">
-                  <span>Сортировка входящих</span>
-                  <span>Утренний брифинг владельцу</span>
-                </div>
-              </div>
+            <article class="lp-card lp-case" data-modal="case-2">
+              <h3>WB-селлер, товарный бизнес</h3>
+              <p class="lp-case-desc">Парсит остатки на складе и сигналит когда пора закупать, пересчитывает маржинальность при изменении цен, мониторит конкурентов на WB, собирает отзывы и готовит черновики ответов. Еженедельная сводка по выручке и динамике.</p>
+              <div class="lp-case-result"><strong>+12</strong><span>ч/нед без ручных таблиц</span></div>
+              <button class="lp-case-more">Подробнее</button>
+            </article>
+
+            <article class="lp-card lp-case" data-modal="case-3">
+              <h3>Рекламное агентство, удалёнка</h3>
+              <p class="lp-case-desc">Каждое утро собирает просроченные задачи из Notion, за 2 дня до сдачи проверяет статусы, анализирует переписки с клиентами и ловит невыполненные обещания. Считает загрузку команды и готовит ежемесячный отчёт по клиентам.</p>
               <div class="lp-case-result"><strong>+21</strong><span>ч/мес освобождённого времени</span></div>
+              <button class="lp-case-more">Подробнее</button>
             </article>
 
-            <article class="lp-card lp-case">
-              <h3>Онлайн-школа, Москва</h3>
-              <div class="lp-case-tools">
-                <p class="lp-case-tools-label">Инструменты:</p>
-                <div class="lp-tags">
-                  <span>FAQ-ответы в Telegram</span>
-                  <span>Контроль оплат</span>
-                </div>
-              </div>
-              <div class="lp-case-result"><strong>+18%</strong><span>к оплатам за месяц</span></div>
+            <article class="lp-card lp-case" data-modal="case-4">
+              <h3>Онлайн-школа английского</h3>
+              <p class="lp-case-desc">Следит за оплатами и пингует по просрочкам, считает загрузку преподавателей, ведёт журнал посещений по голосовым сообщениям. Еженедельная сводка по выручке и оттоку. Генерирует контент для Telegram-канала школы.</p>
+              <div class="lp-case-result"><strong>+18%</strong><span>к продлениям за месяц</span></div>
+              <button class="lp-case-more">Подробнее</button>
             </article>
           </div>
+
+          <div class="lp-modal-overlay" id="caseModal">
+            <div class="lp-modal">
+              <button class="lp-modal-close" aria-label="Закрыть">&times;</button>
+              <div class="lp-modal-body" id="caseModalBody"></div>
+            </div>
+          </div>
+
+          <template id="case-1">
+            <h3>Фитнес-клуб, Казань</h3>
+            <p class="lp-modal-about">Индивидуальные тренировки, групповые занятия, оздоровительные процедуры. Общение с клиентами в Telegram.</p>
+            <h4>Что делает агент:</h4>
+            <ul>
+              <li>Записывает клиентов на тренировки и процедуры через чат-бота — проверяет расписание, подтверждает запись</li>
+              <li>Рассылает напоминания за день и за час до занятия</li>
+              <li>Отвечает на типовые вопросы: цены, расписание, свободные слоты, адрес</li>
+              <li>Собирает обратную связь после посещения</li>
+              <li>Каждое утро отправляет администратору сводку: кто записан, кто отменил, какие слоты свободны</li>
+            </ul>
+          </template>
+
+          <template id="case-2">
+            <h3>WB-селлер, товарный бизнес</h3>
+            <p class="lp-modal-about">Один владелец, 50+ SKU на Wildberries. Закупки, остатки, юнит-экономика в таблицах.</p>
+            <h4>Что делает агент:</h4>
+            <ul>
+              <li>Каждое утро парсит таблицу остатков — считает на сколько дней хватит по каждому SKU и сигналит, когда пора закупать</li>
+              <li>Следит за себестоимостью: при изменении цен у поставщика пересчитывает маржинальность и пингует если она упала ниже порога</li>
+              <li>Мониторит карточки конкурентов на WB — изменения цен, новые товары, обновления описаний. Еженедельный отчёт</li>
+              <li>Собирает новые отзывы — алерт на негатив, черновик ответа</li>
+              <li>Еженедельная сводка: выручка по SKU, динамика остатков, маржинальность по категориям</li>
+            </ul>
+          </template>
+
+          <template id="case-3">
+            <h3>Рекламное агентство, удалёнка</h3>
+            <p class="lp-modal-about">Основатель, 2 дизайнера, копирайтер. 10–15 клиентов одновременно, задачи в Notion, переписки в Telegram.</p>
+            <h4>Что делает агент:</h4>
+            <ul>
+              <li>Каждое утро собирает из Notion просроченные задачи и задачи без исполнителя — пингует в общий чат</li>
+              <li>За 2 дня до сдачи проверяет статус задач и сигналит если что-то не в работе</li>
+              <li>Анализирует переписки с клиентами — формирует список невыполненных обещаний</li>
+              <li>Считает загрузку команды: сколько задач на каждом, кто перегружен, у кого есть слоты</li>
+              <li>Раз в месяц — отчёт по клиентам: задачи выполнены, средняя скорость, количество правок</li>
+            </ul>
+          </template>
+
+          <template id="case-4">
+            <h3>Онлайн-школа английского</h3>
+            <p class="lp-modal-about">Основатель и 3 преподавателя. 80+ учеников, уроки через Zoom, расписание в Google Calendar, оплата через сайт.</p>
+            <h4>Что делает агент:</h4>
+            <ul>
+              <li>Следит за оплатами: парсит данные с сайта, пингует если ученик не оплатил следующий пакет</li>
+              <li>Считает загрузку преподавателей: часы, количество учеников, процент отмен</li>
+              <li>Ведёт журнал посещений в Google Sheets — преподаватель скидывает голосовое, агент заносит тему и присутствующих</li>
+              <li>Еженедельная сводка: выручка, продления, отток, загрузка, пустующие слоты</li>
+              <li>Генерирует контент для Telegram-канала школы на основе тем прошедших уроков</li>
+            </ul>
+          </template>
         </section>
 
         <section id="pricing" class="lp-wrap lp-section">
@@ -171,37 +220,47 @@
 
           <div class="lp-pricing-grid">
             <article class="lp-card lp-plan">
-              <h3>Start</h3>
+              <h3>Базовый</h3>
               <p class="lp-price">4 590 ₽/мес</p>
               <ul>
-                <li>1 агент</li>
-                <li>Telegram + Calendar</li>
-                <li>Core jobs 1,2,4</li>
-                <li>Стандартные лимиты</li>
+                <li>Умный ассистент — вопросы, переводы, расчёты</li>
+                <li>Работа с Google Workspace — Drive, Calendar, Gmail</li>
+                <li>Утренний и вечерний дайджест</li>
+                <li>Разбор и категоризация почты</li>
+                <li>Напоминания и повторяющиеся задачи</li>
+                <li>Распознавание голосовых сообщений</li>
+                <li>Работа с таск-трекерами</li>
+                <li>Отправка сообщений в Telegram-чаты и каналы</li>
+                <li>База знаний — сохраняет заметки, ссылки, идеи и находит по смыслу</li>
               </ul>
               <a class="lp-btn lp-btn-outline" href="/auth">Выбрать</a>
             </article>
 
             <article class="lp-card lp-plan featured">
               <p class="lp-badge">Популярный</p>
-              <h3>Assistant</h3>
+              <h3>Ассистент</h3>
               <p class="lp-price">9 990 ₽/мес</p>
+              <p class="lp-plan-includes">Всё из «Базового», плюс:</p>
               <ul>
-                <li>До 3 агентов</li>
-                <li>Telegram + WA + Slack</li>
-                <li>Премиум-скиллы + Job 5</li>
-                <li>Приоритетная поддержка</li>
+                <li>Работа в браузере — заполнение форм, сбор данных, мониторинг конкурентов</li>
+                <li>Саммари PDF, договоров, КП</li>
+                <li>Генерация и публикация контента в соцсети</li>
+                <li>Черновики и ответы на письма</li>
+                <li>Трекинг доставок и заказов</li>
+                <li>Полная мощность модели: сложные рассуждения, длинные документы, качественные тексты</li>
               </ul>
-              <a class="lp-btn lp-btn-main" href="/auth">Запустить Assistant</a>
+              <a class="lp-btn lp-btn-main" href="/auth">Запустить Ассистент</a>
             </article>
 
             <article class="lp-card lp-plan">
-              <h3>Custom / On-Prem</h3>
+              <h3>Кастом</h3>
+              <p class="lp-price">от 30 000 ₽/мес</p>
               <ul>
-                <li>OpenClaw on-prem</li>
-                <li>Интеграции с CRM/ERP</li>
-                <li>Усиленная безопасность</li>
-                <li>Enterprise сопровождение</li>
+                <li>Выбор модели под задачи (GPT, Claude, комбинация)</li>
+                <li>Настройка агента под процессы, скрипты, шаблоны клиента</li>
+                <li>Подключение специфических сервисов</li>
+                <li>Обучение агента под конкретные сайты и интерфейсы</li>
+                <li>Выделенная поддержка</li>
               </ul>
               <a class="lp-btn lp-btn-outline" href="/auth">Обсудить</a>
             </article>

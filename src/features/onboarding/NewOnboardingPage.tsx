@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate, NavLink } from 'react-router-dom'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   getOnboardingState,
   saveOnboardingAnswer,
@@ -163,6 +163,7 @@ function QuestionScreen({
 
 export function NewOnboardingPage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [currentScreen, setCurrentScreen] = useState<number>(0) // 0 = intro, 1-5 = questions
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [error, setError] = useState<string | null>(null)
@@ -214,6 +215,9 @@ export function NewOnboardingPage() {
   const finishMutation = useMutation({
     mutationFn: finishOnboarding,
     onSuccess: () => {
+      queryClient.setQueryData(['onboardingState'], (old: OnboardingStateResponse | undefined) =>
+        old ? { ...old, is_completed: true } : old
+      )
       navigate('/agent/settings', { replace: true })
     },
     onError: (err: Error) => setError(err.message),
