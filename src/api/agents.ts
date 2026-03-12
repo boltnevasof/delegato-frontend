@@ -1,17 +1,66 @@
-import type { components } from './generated/schema'
 import { apiRequest } from './client'
 
-type AgentDetailResponse = components['schemas']['AgentDetailResponse']
-type AsyncTaskAcceptedResponse = components['schemas']['AsyncTaskAcceptedResponse']
-type AsyncTaskStatusResponse = components['schemas']['AsyncTaskStatusResponse']
-type OnboardingCompleteResponse = components['schemas']['OnboardingCompleteResponse']
-type OnboardingConnectChannelResponse = components['schemas']['OnboardingConnectChannelResponse']
-type OnboardingSelectSkillsResponse = components['schemas']['OnboardingSelectSkillsResponse']
-type MessageResponse = components['schemas']['MessageResponse']
+// ── Встроенные типы (не из schema.ts) ────────────────────────────────────────
 
+type SkillSummary = { id: string; slug: string; is_enabled: boolean }
+type ToolSummary  = { id: string; slug: string; is_enabled: boolean }
+type ChannelSummary = { id: string; type: string; status: string }
+type ServerSummary  = { id: string; status: string; ip_address: string | null }
+
+type AgentDetailResponse = {
+  id: string
+  status: string
+  soul_md: string | null
+  agent_md: string | null
+  onboarding_step: number
+  skills: SkillSummary[]
+  tools: ToolSummary[]
+  channels: ChannelSummary[]
+  server: ServerSummary | null
+}
+
+type AsyncTaskAcceptedResponse = { task_id: string; status: string; message: string }
+type AsyncTaskStatusResponse   = { task_id: string; status: string; result?: Record<string, unknown>; error?: string }
+type OnboardingCompleteResponse = { status: string; task_id?: string | null }
+type OnboardingConnectChannelResponse = { id: string; channel_type: string; status: string }
+type OnboardingSelectSkillsResponse = { activated_skills: SkillSummary[] }
+type MessageResponse = { message: string }
+
+// ── Типы: настройки агента ────────────────────────────────────────────────────
+
+export type AgentAboutData = {
+  name: string | null
+  location: string | null
+  about_self: string | null
+  occupation: string | null
+  agent_restrictions: string | null
+  user_md: string | null
+  agent_md: string | null
+  soul_md: string | null
+  is_synchronized: boolean
+}
+
+export type AgentAboutRequest = {
+  name?: string | null
+  location?: string | null
+  about_self?: string | null
+  occupation?: string | null
+  agent_restrictions?: string | null
+}
+
+export type AgentAboutResponse = AgentAboutData
+
+// ── Агент ─────────────────────────────────────────────────────────────────────
+
+/** Получить агента текущего пользователя (используется старыми страницами) */
 export function getAgent(): Promise<AgentDetailResponse> {
   return apiRequest<AgentDetailResponse>('/agents/me')
 }
+
+/** Алиас для совместимости с новыми компонентами */
+export const getAgentMe = getAgent
+
+// ── Онбординг ─────────────────────────────────────────────────────────────────
 
 export function onboardingDescribe(description: string): Promise<AsyncTaskAcceptedResponse> {
   return apiRequest<AsyncTaskAcceptedResponse>('/agents/onboarding/describe', {
@@ -21,9 +70,7 @@ export function onboardingDescribe(description: string): Promise<AsyncTaskAccept
 }
 
 export function onboardingSkipDescribe(): Promise<MessageResponse> {
-  return apiRequest<MessageResponse>('/agents/onboarding/skip-describe', {
-    method: 'POST',
-  })
+  return apiRequest<MessageResponse>('/agents/onboarding/skip-describe', { method: 'POST' })
 }
 
 export function onboardingConnectChannel(
@@ -42,40 +89,63 @@ export function onboardingSelectSkills(
 ): Promise<OnboardingSelectSkillsResponse> {
   return apiRequest<OnboardingSelectSkillsResponse>('/agents/onboarding/select-skills', {
     method: 'POST',
-    body: JSON.stringify({
-      skill_ids: skillIds,
-      preset_slug: presetSlug || null,
-    }),
+    body: JSON.stringify({ skill_ids: skillIds, preset_slug: presetSlug || null }),
   })
 }
 
 export function onboardingComplete(): Promise<OnboardingCompleteResponse> {
-  return apiRequest<OnboardingCompleteResponse>('/agents/onboarding/complete', {
-    method: 'POST',
-  })
+  return apiRequest<OnboardingCompleteResponse>('/agents/onboarding/complete', { method: 'POST' })
 }
+
+// ── Статус задачи ─────────────────────────────────────────────────────────────
 
 export function getTaskStatus(taskId: string): Promise<AsyncTaskStatusResponse> {
   return apiRequest<AsyncTaskStatusResponse>(`/agents/tasks/${taskId}/status`)
 }
 
-export function updateSoulMd(content: string): Promise<MessageResponse> {
-  return apiRequest<MessageResponse>('/agents/me/soul-md', {
-    method: 'PUT',
-    body: JSON.stringify({ content }),
-  })
+// ── Пошаговый onboarding ─────────────────────────────────────────────────────
+
+export type OnboardingAnswerEntry = { question_id: string; answer: string | null }
+
+export type OnboardingStateResponse = {
+  current_step: number
+  is_completed: boolean
+  answers: OnboardingAnswerEntry[]
 }
 
-export function updateAgentMd(content: string): Promise<MessageResponse> {
-  return apiRequest<MessageResponse>('/agents/me/agent-md', {
-    method: 'PUT',
-    body: JSON.stringify({ content }),
-  })
+export function getOnboardingState(): Promise<OnboardingStateResponse> {
+  return apiRequest<OnboardingStateResponse>('/agents/onboarding/state')
 }
 
-export function enhance(field: string, content: string): Promise<AsyncTaskAcceptedResponse> {
-  return apiRequest<AsyncTaskAcceptedResponse>('/agents/me/enhance', {
+export function saveOnboardingAnswer(questionId: string, answer: string | null): Promise<{ status: string }> {
+  return apiRequest<{ status: string }>('/agents/onboarding/answer', {
     method: 'POST',
-    body: JSON.stringify({ field, content }),
+    body: JSON.stringify({ question_id: questionId, answer }),
+  })
+}
+
+export function updateOnboardingStep(step: number): Promise<{ status: string }> {
+  return apiRequest<{ status: string }>('/agents/onboarding/step', {
+    method: 'POST',
+    body: JSON.stringify({ step }),
+  })
+}
+
+export function finishOnboarding(): Promise<AsyncTaskAcceptedResponse> {
+  return apiRequest<AsyncTaskAcceptedResponse>('/agents/onboarding/finish', {
+    method: 'POST',
+  })
+}
+
+// ── Настройки агента (about) ──────────────────────────────────────────────────
+
+export function getAgentAbout(): Promise<AgentAboutResponse> {
+  return apiRequest<AgentAboutResponse>('/agents/me/about')
+}
+
+export function saveAgentAbout(data: AgentAboutRequest): Promise<AsyncTaskAcceptedResponse> {
+  return apiRequest<AsyncTaskAcceptedResponse>('/agents/me/about', {
+    method: 'PUT',
+    body: JSON.stringify(data),
   })
 }

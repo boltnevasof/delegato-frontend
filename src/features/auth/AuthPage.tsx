@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useAuth } from '../../shared/hooks/useAuth'
 import { useApiError } from '../../shared/hooks/useApiError'
 import { sendOtp, verifyOtp, googleInitiateUrl } from '../../api/auth'
-import { getMe } from '../../api/users'
+
 import { Button, ErrorBanner } from '../../shared/ui'
 
 type Step = 'methods' | 'code' | 'success'
@@ -42,15 +42,7 @@ export function AuthPage() {
       login(tokens.access_token, tokens.refresh_token)
       setStep('success')
 
-      // Determine redirect based on user state
-      const user = await getMe()
-      if (!user.subscription) {
-        navigate('/pricing', { replace: true })
-      } else if (user.agent && user.agent.onboarding_step > 0 && user.agent.onboarding_step <= 5) {
-        navigate(`/onboarding/${user.agent.onboarding_step}`, { replace: true })
-      } else {
-        navigate('/dashboard', { replace: true })
-      }
+      navigate('/agent/settings', { replace: true })
     } catch (err) {
       setError(err)
     } finally {

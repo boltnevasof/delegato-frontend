@@ -21,6 +21,58 @@ type AdminUpdateUserRequest = components['schemas']['AdminUpdateUserRequest']
 type AdminUpdateUserResponse = components['schemas']['AdminUpdateUserResponse']
 type AdminOTPCodeListResponse = components['schemas']['AdminOTPCodeListResponse']
 
+// Tariff types (manual — not yet in generated schema)
+export type AdminTariffListItem = {
+  id: string
+  slug: string
+  name: string
+  price_rub: number
+  max_channels: number | null
+  llm_model: string | null
+  skills_access: string
+  is_self_service: boolean
+  is_active: boolean
+  created_at: string
+}
+
+export type AdminTariffListResponse = {
+  items: AdminTariffListItem[]
+  total: number
+  page: number
+  per_page: number
+}
+
+export type AdminTariffResponse = AdminTariffListItem
+
+export type AdminCreateTariffRequest = {
+  slug: string
+  name: string
+  price_rub: number
+  max_channels?: number | null
+  llm_model?: string | null
+  skills_access?: string
+  is_self_service?: boolean
+  is_active?: boolean
+}
+
+export type AdminUpdateTariffRequest = {
+  slug?: string
+  name?: string
+  price_rub?: number
+  max_channels?: number | null
+  llm_model?: string | null
+  skills_access?: string
+  is_self_service?: boolean
+  is_active?: boolean
+}
+
+export type AdminUserSubscriptionResponse = {
+  subscription_id: string | null
+  tariff_plan_id: string | null
+  tariff_name: string | null
+  status: string | null
+}
+
 let adminAccessToken: string | null = localStorage.getItem(ADMIN_ACCESS_TOKEN_KEY)
 
 export function getAdminAccessToken(): string | null {
@@ -115,6 +167,59 @@ export function listAdminOtpCodes(
   const params = new URLSearchParams({ page: String(page), per_page: String(perPage) })
   if (email) params.set('email', email)
   return adminRequest<AdminOTPCodeListResponse>(`/admin/otp-codes?${params.toString()}`)
+}
+
+// --- Tariff CRUD ---
+
+export function listAdminTariffs(
+  page = 1,
+  perPage = 20,
+): Promise<AdminTariffListResponse> {
+  const params = new URLSearchParams({ page: String(page), per_page: String(perPage) })
+  return adminRequest<AdminTariffListResponse>(`/admin/tariffs?${params.toString()}`)
+}
+
+export function createAdminTariff(
+  payload: AdminCreateTariffRequest,
+): Promise<AdminTariffResponse> {
+  return adminRequest<AdminTariffResponse>('/admin/tariffs', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function updateAdminTariff(
+  tariffId: string,
+  payload: AdminUpdateTariffRequest,
+): Promise<AdminTariffResponse> {
+  return adminRequest<AdminTariffResponse>(`/admin/tariffs/${tariffId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function deleteAdminTariff(tariffId: string): Promise<void> {
+  return adminRequest<void>(`/admin/tariffs/${tariffId}`, {
+    method: 'DELETE',
+  })
+}
+
+// --- User subscription ---
+
+export function getAdminUserSubscription(
+  userId: string,
+): Promise<AdminUserSubscriptionResponse> {
+  return adminRequest<AdminUserSubscriptionResponse>(`/admin/users/${userId}/subscription`)
+}
+
+export function assignAdminUserTariff(
+  userId: string,
+  tariffPlanId: string,
+): Promise<AdminUserSubscriptionResponse> {
+  return adminRequest<AdminUserSubscriptionResponse>(`/admin/users/${userId}/assign-tariff`, {
+    method: 'POST',
+    body: JSON.stringify({ tariff_plan_id: tariffPlanId }),
+  })
 }
 
 async function adminRequest<T>(

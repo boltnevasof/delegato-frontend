@@ -1,32 +1,7 @@
-export function Spinner() {
-  return (
-    <div className="loader-wrap">
-      <div className="boxes">
-        <div className="box">
-          <div />
-          <div />
-          <div />
-          <div />
-        </div>
-        <div className="box">
-          <div />
-          <div />
-          <div />
-          <div />
-        </div>
-        <div className="box">
-          <div />
-          <div />
-          <div />
-          <div />
-        </div>
-        <div className="box">
-          <div />
-          <div />
-          <div />
-          <div />
-        </div>
-      </div>
-    </div>
-  )
+type SpinnerProps = {
+  size?: 'sm' | 'md'
+}
+
+export function Spinner({ size = 'md' }: SpinnerProps) {
+  return <span className={`spinner-loading spinner-loading--${size}`} aria-label="Загрузка..." />
 }

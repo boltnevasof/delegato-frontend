@@ -22,39 +22,19 @@ function Icon({ children }: { children: ReactNode }) {
 
 const navItems = [
   {
-    to: '/dashboard',
-    label: 'Дашборд',
+    to: '/agent/settings',
+    label: 'Настройки агента',
     icon: (
       <Icon>
-        <path d="M10 6.025A7.5 7.5 0 1 0 17.975 14H10V6.025Z" />
-        <path d="M13.5 3c-.169 0-.334.014-.5.025V11h7.975c.011-.166.025-.331.025-.5A7.5 7.5 0 0 0 13.5 3Z" />
-      </Icon>
-    ),
-  },
-  {
-    to: '/agent/personality',
-    label: 'Личность',
-    icon: (
-      <Icon>
-        <path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" />
-        <path d="M20 21c0-3.3-3.6-6-8-6s-8 2.7-8 6" />
-      </Icon>
-    ),
-  },
-  {
-    to: '/agent/rules',
-    label: 'Правила',
-    icon: (
-      <Icon>
-        <path d="M9 7H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-4" />
-        <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2H9Z" />
-        <path d="M8 12h8M8 16h5" />
+        <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <circle cx="12" cy="12" r="3" />
       </Icon>
     ),
   },
   {
     to: '/agent/skills',
     label: 'Задачи и скиллы',
+    hidden: true,
     icon: (
       <Icon>
         <path d="M13 3v7h6l-8 11v-7H5l8-11Z" />
@@ -64,6 +44,7 @@ const navItems = [
   {
     to: '/agent/tools',
     label: 'Инструменты',
+    hidden: true,
     icon: (
       <Icon>
         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z" />
@@ -108,23 +89,21 @@ export function DashboardLayout() {
   return (
     <>
       <header className="header">
-        <NavLink to="/" className="header-logo">
+        <a href="/" className="header-logo">
           Delegato
-        </NavLink>
+        </a>
         <div className="header-right">
-          <NavLink to="/billing">Подписка</NavLink>
+          <NavLink to="/billing" className="header-link">Подписка</NavLink>
         </div>
       </header>
       <div className="layout-sidebar">
         <nav className="sidebar">
           <ul className="sidebar-list">
-            {navItems.map((item) => (
+            {navItems.filter((item) => !item.hidden).map((item) => (
               <li key={item.to}>
                 <NavLink
                   to={item.to}
-                  className={({ isActive }) =>
-                    `sidebar-link${isActive ? ' active' : ''}`
-                  }
+                  className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
                 >
                   {item.icon}
                   <span>{item.label}</span>

@@ -3,11 +3,15 @@ import type { FormEvent } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import type { components } from '../../api/generated/schema'
 import {
+  assignAdminUserTariff,
   clearAdminAccessToken,
   getAdminAccessToken,
+  getAdminUserSubscription,
+  listAdminTariffs,
   listAdminUsers,
   updateAdminUser,
 } from '../../api/admin'
+import type { AdminTariffListItem, AdminUserSubscriptionResponse } from '../../api/admin'
 import { Button, Card, ErrorBanner, Input } from '../../shared/ui'
 
 type AdminUserListItem = components['schemas']['AdminUserListItem']
@@ -69,6 +73,13 @@ export function AdminUserDetailPage() {
   const [editRole, setEditRole] = useState(stateUser?.role || '')
   const [editActive, setEditActive] = useState(stateUser ? String(stateUser.is_active) : '')
 
+  // Tariff assignment state
+  const [tariffs, setTariffs] = useState<AdminTariffListItem[]>([])
+  const [subscription, setSubscription] = useState<AdminUserSubscriptionResponse | null>(null)
+  const [selectedTariffId, setSelectedTariffId] = useState('')
+  const [tariffLoading, setTariffLoading] = useState(false)
+  const [tariffError, setTariffError] = useState<string | null>(null)
+
   const handleLogout = () => {
     clearAdminAccessToken()
     setIsAuthenticated(false)
@@ -107,6 +118,27 @@ export function AdminUserDetailPage() {
     void load()
   }, [isAuthenticated, stateUser, userId])
 
+  // Load tariffs and subscription
+  useEffect(() => {
+    if (!isAuthenticated || !userId) return
+
+    const loadTariffData = async () => {
+      try {
+        const [tariffList, sub] = await Promise.all([
+          listAdminTariffs(1, 100),
+          getAdminUserSubscription(userId),
+        ])
+        setTariffs(tariffList.items)
+        setSubscription(sub)
+        setSelectedTariffId(sub.tariff_plan_id || '')
+      } catch (e) {
+        setTariffError((e as { message?: string }).message || 'Не удалось загрузить тарифы')
+      }
+    }
+
+    void loadTariffData()
+  }, [isAuthenticated, userId])
+
   const handleSave = async (event: FormEvent) => {
     event.preventDefault()
     if (!user) return
@@ -129,6 +161,22 @@ export function AdminUserDetailPage() {
       setError((e as { message?: string }).message || 'Не удалось сохранить изменения')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAssignTariff = async () => {
+    if (!selectedTariffId || !userId) return
+
+    setTariffLoading(true)
+    setTariffError(null)
+    try {
+      const sub = await assignAdminUserTariff(userId, selectedTariffId)
+      setSubscription(sub)
+      setSelectedTariffId(sub.tariff_plan_id || '')
+    } catch (e) {
+      setTariffError((e as { message?: string }).message || 'Не удалось назначить тариф')
+    } finally {
+      setTariffLoading(false)
     }
   }
 
@@ -176,6 +224,45 @@ export function AdminUserDetailPage() {
           />
           <Button type="submit" loading={loading} disabled={!user}>Сохранить</Button>
         </form>
+      </Card>
+
+      <Card className="mt-16 admin-detail-card">
+        <h2 className="admin-section-title">Тариф</h2>
+
+        {subscription && subscription.tariff_name ? (
+          <p className="subtitle">
+            Текущий тариф: <strong>{subscription.tariff_name}</strong> (статус: {subscription.status})
+          </p>
+        ) : (
+          <p className="subtitle">Тариф не назначен</p>
+        )}
+
+        {tariffError && <ErrorBanner message={tariffError} />}
+
+        <div className="admin-user-form">
+          <div>
+            <label className="form-label">Выберите тариф</label>
+            <select
+              className="form-input"
+              value={selectedTariffId}
+              onChange={(e) => setSelectedTariffId(e.target.value)}
+            >
+              <option value="">— не выбран —</option>
+              {tariffs.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name} ({t.slug}) — {t.price_rub} коп.
+                </option>
+              ))}
+            </select>
+          </div>
+          <Button
+            onClick={handleAssignTariff}
+            loading={tariffLoading}
+            disabled={!selectedTariffId}
+          >
+            Назначить тариф
+          </Button>
+        </div>
       </Card>
     </div>
   )

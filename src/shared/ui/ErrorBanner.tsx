@@ -5,13 +5,12 @@ type ErrorBannerProps = {
 
 export function ErrorBanner({ message, onRetry }: ErrorBannerProps) {
   return (
-    <div className="error-banner">
-      <strong>Error</strong>
-      {message}
+    <div className="error-banner show">
+      <strong>Ошибка:</strong> {message}
       {onRetry && (
-        <div className="error-actions">
-          <button className="btn btn--small" onClick={onRetry}>Retry</button>
-        </div>
+        <button className="error-banner-retry" onClick={onRetry}>
+          Повторить
+        </button>
       )}
     </div>
   )

@@ -1,22 +1,25 @@
-import { forwardRef, type InputHTMLAttributes } from 'react'
+import type { InputHTMLAttributes } from 'react'
+import { forwardRef } from 'react'
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
-  label?: string
   error?: string
+  label?: string
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className = '', ...props }, ref) => {
-    return (
-      <div className="form-group">
-        {label && <label>{label}</label>}
-        <input
-          ref={ref}
-          className={`form-input ${error ? 'input-error' : ''} ${className}`.trim()}
-          {...props}
-        />
-        {error && <div className="form-error">{error}</div>}
-      </div>
-    )
-  }
-)
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  { error, label, className = '', id, ...props },
+  ref,
+) {
+  return (
+    <div className="form-group">
+      {label && <label htmlFor={id}>{label}</label>}
+      <input
+        ref={ref}
+        id={id}
+        className={`form-input ${error ? 'input-error' : ''} ${className}`}
+        {...props}
+      />
+      {error && <span className="form-error">{error}</span>}
+    </div>
+  )
+})
