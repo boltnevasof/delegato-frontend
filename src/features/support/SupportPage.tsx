@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import { Button } from '../../shared/ui'
+import { createSupportRequest } from '../../api/support'
+import { Button, ErrorBanner } from '../../shared/ui'
 
 const TOPICS = [
   { value: 'agent', label: 'Агент' },
@@ -28,6 +29,8 @@ type FormValues = {
 export function SupportPage() {
   const navigate = useNavigate()
   const [ticketId, setTicketId] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const {
     register,
@@ -44,13 +47,27 @@ export function SupportPage() {
     },
   })
 
-  function onSubmit(_data: FormValues) {
-    const id = `SUP-${Date.now()}`
-    setTicketId(id)
+  async function onSubmit(data: FormValues) {
+    setLoading(true)
+    setError(null)
+    try {
+      const result = await createSupportRequest({
+        topic: data.topic,
+        description: data.description,
+        contact_method: data.contactMethod,
+        contact: data.contact,
+      })
+      setTicketId(result.id)
+    } catch (err) {
+      setError((err as { message?: string }).message || 'Ошибка при отправке')
+    } finally {
+      setLoading(false)
+    }
   }
 
   function handleReset() {
     setTicketId(null)
+    setError(null)
     reset()
   }
 
@@ -78,6 +95,8 @@ export function SupportPage() {
     <div className="support-page">
       <h1>Поддержка</h1>
       <p className="text-muted mb-24">Опишите вашу проблему, и мы свяжемся с вами</p>
+
+      {error && <ErrorBanner message={error} onRetry={() => setError(null)} />}
 
       <form className="support-form" onSubmit={handleSubmit(onSubmit)}>
         <div className="form-group">
@@ -146,7 +165,7 @@ export function SupportPage() {
           {errors.consent && <span className="form-error">{errors.consent.message}</span>}
         </div>
 
-        <Button type="submit" style={{ width: '100%' }}>
+        <Button type="submit" loading={loading} loadingText="Отправляем..." style={{ width: '100%' }}>
           Отправить
         </Button>
       </form>

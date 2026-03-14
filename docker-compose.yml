@@ -5,5 +5,6 @@ services:
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api/v1}
         VITE_TELEGRAM_BOT_NAME: ${VITE_TELEGRAM_BOT_NAME:-}
+        VITE_TELEGRAM_BOT_ID: ${VITE_TELEGRAM_BOT_ID:-}
     ports:
       - "80:80"

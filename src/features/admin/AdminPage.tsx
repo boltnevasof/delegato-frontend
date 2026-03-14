@@ -14,6 +14,7 @@ import {
   listAdminCustomRequests,
   listAdminOtpCodes,
   listAdminServers,
+  listAdminSupportRequests,
   listAdminTariffs,
   listAdminUsers,
   updateAdminTariff,
@@ -22,6 +23,8 @@ import type {
   AdminTariffListItem,
   AdminTariffListResponse,
   AdminCreateTariffRequest,
+  AdminSupportRequestItem,
+  AdminSupportRequestListResponse,
 } from '../../api/admin'
 import { Button, Card, ErrorBanner, Input } from '../../shared/ui'
 import { AdminTable, type AdminTableColumn } from './components/AdminTable'
@@ -32,6 +35,7 @@ type TabKey =
   | 'servers_stats'
   | 'agents'
   | 'custom_requests'
+  | 'support_requests'
   | 'otp_codes'
   | 'tariffs'
 
@@ -55,6 +59,7 @@ type ListData =
   | ServerLogListResponse
   | AdminAgentListResponse
   | AdminCustomRequestListResponse
+  | AdminSupportRequestListResponse
   | AdminOTPCodeListResponse
   | AdminTariffListResponse
 
@@ -64,6 +69,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'servers_stats', label: 'Статистика серверов' },
   { key: 'agents', label: 'Агенты' },
   { key: 'custom_requests', label: 'Заявки' },
+  { key: 'support_requests', label: 'Поддержка' },
   { key: 'otp_codes', label: 'OTP-коды' },
   { key: 'tariffs', label: 'Тарифы' },
 ]
@@ -181,6 +187,9 @@ export function AdminPage() {
           break
         case 'custom_requests':
           data = await listAdminCustomRequests(targetPage, perPage, customStatus || undefined)
+          break
+        case 'support_requests':
+          data = await listAdminSupportRequests(targetPage, perPage, customStatus || undefined)
           break
         case 'otp_codes':
           data = await listAdminOtpCodes(targetPage, perPage, otpEmail || undefined)
@@ -375,6 +384,17 @@ export function AdminPage() {
     { key: 'created', header: 'Создана', render: (request) => formatDate(request.created_at) },
   ]
 
+  const supportRequestColumns: AdminTableColumn<AdminSupportRequestItem>[] = [
+    { key: 'id', header: 'ID', render: (r) => shortId(r.id) },
+    { key: 'user', header: 'User ID', render: (r) => shortId(r.user_id) },
+    { key: 'topic', header: 'Тема', render: (r) => r.topic },
+    { key: 'description', header: 'Описание', render: (r) => r.description.length > 50 ? r.description.slice(0, 50) + '...' : r.description },
+    { key: 'status', header: 'Статус', render: (r) => r.status },
+    { key: 'contact_method', header: 'Способ связи', render: (r) => r.contact_method },
+    { key: 'contact', header: 'Контакт', render: (r) => r.contact },
+    { key: 'created', header: 'Создана', render: (r) => formatDate(r.created_at) },
+  ]
+
   const otpColumns: AdminTableColumn<AdminOTPCodeItem>[] = [
     { key: 'id', header: 'ID', render: (otp) => shortId(otp.id) },
     { key: 'email', header: 'Email', render: (otp) => otp.email },
@@ -464,7 +484,7 @@ export function AdminPage() {
             </>
           )}
 
-          {activeTab === 'custom_requests' && (
+          {(activeTab === 'custom_requests' || activeTab === 'support_requests') && (
             <Input
               label="Статус"
               value={customStatus}
@@ -566,6 +586,15 @@ export function AdminPage() {
           title="Кастомные заявки"
           columns={requestColumns}
           rows={filterRowsById(listData.items as AdminCustomRequestItem[])}
+          rowKey={(row) => row.id}
+        />
+      )}
+
+      {activeTab === 'support_requests' && listData && (
+        <AdminTable
+          title="Обращения в поддержку"
+          columns={supportRequestColumns}
+          rows={filterRowsById(listData.items as AdminSupportRequestItem[])}
           rowKey={(row) => row.id}
         />
       )}
