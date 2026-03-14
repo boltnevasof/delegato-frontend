@@ -27,6 +27,7 @@ const lazyAdmin = () => import('../features/admin/AdminPage').then(m => ({ Compo
 const lazyAdminUser = () => import('../features/admin/AdminUserDetailPage').then(m => ({ Component: m.AdminUserDetailPage }))
 const lazyLanding = () => import('../features/landing/LandingPage').then(m => ({ Component: m.LandingPage }))
 const lazyNewOnboarding = () => import('../features/onboarding/NewOnboardingPage').then(m => ({ Component: m.NewOnboardingPage }))
+const lazyChoosePlan = () => import('../features/billing/ChoosePlanPage').then(m => ({ Component: m.ChoosePlanPage }))
 
 export const router = createBrowserRouter([
   {
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       { path: '/onboarding', lazy: lazyNewOnboarding },
+      { path: '/choose-plan', lazy: lazyChoosePlan },
     ],
   },
   {

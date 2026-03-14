@@ -151,7 +151,7 @@ export function AgentSettingsPage() {
             <textarea
               id="about_self"
               className="form-input agent-settings-textarea"
-              rows={4}
+              rows={3}
               placeholder="Кто вы, чем занимаетесь, какой у вас опыт..."
               {...register('about_self')}
             />
@@ -180,7 +180,7 @@ export function AgentSettingsPage() {
             <textarea
               id="agent_restrictions"
               className="form-input agent-settings-textarea"
-              rows={3}
+              rows={2}
               placeholder="Например: не давать скидки без моего подтверждения, не обсуждать конкурентов..."
               {...register('agent_restrictions')}
             />

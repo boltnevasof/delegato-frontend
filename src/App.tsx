@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from './shared/hooks/useAuth'
@@ -10,6 +11,7 @@ import { SkillsPage } from './features/skills/SkillsPage'
 import { ToolsPage } from './features/tools/ToolsPage'
 import { ChannelPage } from './features/channels/ChannelPage'
 import { SubscriptionPage } from './features/billing/SubscriptionPage'
+import { ChoosePlanPage } from './features/billing/ChoosePlanPage'
 import { SupportPage } from './features/support/SupportPage'
 import { AdminPage } from './features/admin/AdminPage'
 import { AdminUserDetailPage } from './features/admin/AdminUserDetailPage'
@@ -26,7 +28,7 @@ function ProtectedRoute() {
 
 function GuestRoute() {
   const { isAuthenticated } = useAuth()
-  if (isAuthenticated) return <Navigate to="/billing" replace />
+  if (isAuthenticated) return <Navigate to="/agent/settings" replace />
   return <Outlet />
 }
 
@@ -63,11 +65,10 @@ function AppGuard() {
   if (userError) return <Outlet />
 
   const path = location.pathname
-  const billingPages = ['/billing', '/support']
 
-  // Нет подписки → разрешаем только billing/support, остальное → /billing
+  // Нет подписки → разрешаем только choose-plan, остальное → /choose-plan
   if (!hasSubscription) {
-    if (!billingPages.includes(path)) return <Navigate to="/billing" replace />
+    if (path !== '/choose-plan') return <Navigate to="/choose-plan" replace />
     return <Outlet />
   }
 
@@ -79,9 +80,27 @@ function AppGuard() {
   return <Outlet />
 }
 
+/** Блокируем скролл body на всех SPA-страницах,
+ *  но разрешаем на лендинге ("/"), где React рендерит null */
+function ScrollLock() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    const isLanding = pathname === '/'
+    const overflow = isLanding ? '' : 'hidden'
+    document.documentElement.style.overflow = overflow
+    document.body.style.overflow = overflow
+    return () => {
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+    }
+  }, [pathname])
+  return null
+}
+
 export function App() {
   return (
     <BrowserRouter>
+      <ScrollLock />
       <Routes>
         {/* Авторизация */}
         <Route element={<GuestRoute />}>
@@ -94,6 +113,7 @@ export function App() {
         {/* Все авторизованные маршруты — единый гард */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppGuard />}>
+            <Route path="/choose-plan" element={<ChoosePlanPage />} />
             <Route path="/onboarding" element={<NewOnboardingPage />} />
             <Route element={<DashboardLayout />}>
               <Route path="/billing" element={<SubscriptionPage />} />

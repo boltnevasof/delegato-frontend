@@ -8,7 +8,7 @@ import { Spinner } from '../../shared/ui'
 async function resolvePostLoginRoute(): Promise<string> {
   try {
     const user = await getMe()
-    if (!user.subscription) return '/billing'
+    if (!user.subscription) return '/choose-plan'
 
     try {
       const state = await getOnboardingState()
@@ -19,7 +19,7 @@ async function resolvePostLoginRoute(): Promise<string> {
 
     return '/agent/settings'
   } catch {
-    return '/billing'
+    return '/choose-plan'
   }
 }
 
@@ -48,7 +48,7 @@ export function GoogleCallback() {
 
     resolvePostLoginRoute()
       .then((route) => navigate(route, { replace: true }))
-      .catch(() => navigate('/billing', { replace: true }))
+      .catch(() => navigate('/choose-plan', { replace: true }))
   }, [login, navigate])
 
   return (
