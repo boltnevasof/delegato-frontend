@@ -18,6 +18,8 @@ import { AdminUserDetailPage } from './features/admin/AdminUserDetailPage'
 import { AuthPage } from './features/auth/AuthPage'
 import { GoogleCallback } from './features/auth/GoogleCallback'
 import { NewOnboardingPage } from './features/onboarding/NewOnboardingPage'
+import { LandingPage } from './features/landing/LandingPage'
+import { FeaturesPage } from './features/landing/FeaturesPage'
 import { Spinner } from './shared/ui'
 
 function ProtectedRoute() {
@@ -81,17 +83,39 @@ function AppGuard() {
 }
 
 /** Блокируем скролл body на всех SPA-страницах,
- *  но разрешаем на лендинге ("/"), где React рендерит null */
+ *  но разрешаем на лендинге и странице возможностей.
+ *  Также переключаем #app из fixed-оверлея в обычный flow для лендинга. */
 function ScrollLock() {
   const { pathname } = useLocation()
   useEffect(() => {
-    const isLanding = pathname === '/'
-    const overflow = isLanding ? '' : 'hidden'
+    const allowScroll = pathname === '/' || pathname === '/features'
+    const overflow = allowScroll ? '' : 'hidden'
     document.documentElement.style.overflow = overflow
     document.body.style.overflow = overflow
+
+    window.scrollTo(0, 0)
+
+    const appEl = document.getElementById('app')
+    if (appEl) {
+      if (allowScroll) {
+        appEl.style.position = 'static'
+        appEl.style.overflow = 'visible'
+        appEl.style.background = 'transparent'
+      } else {
+        appEl.style.position = ''
+        appEl.style.overflow = ''
+        appEl.style.background = ''
+      }
+    }
+
     return () => {
       document.documentElement.style.overflow = ''
       document.body.style.overflow = ''
+      if (appEl) {
+        appEl.style.position = ''
+        appEl.style.overflow = ''
+        appEl.style.background = ''
+      }
     }
   }, [pathname])
   return null
@@ -130,8 +154,9 @@ export function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/admin/users/:userId" element={<AdminUserDetailPage />} />
 
-        {/* Лендинг — React ничего не рендерит */}
-        <Route path="/" element={null} />
+        {/* Лендинг */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/features" element={<FeaturesPage />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
